@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import BlogIndex from "@/components/BlogIndex";
-import { getPostCards, getSettings, getTopics } from "@/lib/content";
+import { getPostCards, getSettings } from "@/lib/content";
 import { canonicalPath } from "@/lib/links";
 import { pageCount, pageSlice } from "@/lib/pagination";
 
@@ -26,11 +26,7 @@ async function resolvePage(n: string) {
   const page = Number(n);
   if (!Number.isInteger(page) || page < 1) notFound();
 
-  const [posts, topics, settings] = await Promise.all([
-    getPostCards(),
-    getTopics(),
-    getSettings(),
-  ]);
+  const [posts, settings] = await Promise.all([getPostCards(), getSettings()]);
 
   const ordered = settings.featuredSlug
     ? [
@@ -42,7 +38,7 @@ async function resolvePage(n: string) {
   const totalPages = pageCount(ordered.length);
   if (page > totalPages) notFound();
 
-  return { page, ordered, topics, settings, totalPages };
+  return { page, ordered, settings, totalPages };
 }
 
 export async function generateStaticParams() {
@@ -71,12 +67,11 @@ export default async function PaginatedIndexPage({ params }: Props) {
   const { n } = await params;
   if (n === "1") redirect("/");
 
-  const { page, ordered, topics, settings, totalPages } = await resolvePage(n);
+  const { page, ordered, settings, totalPages } = await resolvePage(n);
 
   return (
     <BlogIndex
       posts={pageSlice(ordered, page)}
-      topics={topics.filter((t) => t.postCount > 0)}
       settings={settings}
       page={page}
       totalPages={totalPages}

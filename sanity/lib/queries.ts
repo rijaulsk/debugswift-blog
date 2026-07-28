@@ -57,6 +57,7 @@ export const postProjection = groq`
   body,
   faqs[]{ question, answer },
   sources[]{ label, url },
+  audio{ url, durationSeconds, voice, generatedAt },
   seoTitle,
   seoDescription,
   noindex

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import BlogIndex from "@/components/BlogIndex";
 import { BLOG_HERO } from "@/content";
-import { getPostCards, getSettings, getTopics } from "@/lib/content";
+import { getPostCards, getSettings } from "@/lib/content";
 import { blogUrl, canonicalPath } from "@/lib/links";
 import { pageCount, pageSlice } from "@/lib/pagination";
 
@@ -36,11 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BlogIndexPage() {
-  const [posts, topics, settings] = await Promise.all([
-    getPostCards(),
-    getTopics(),
-    getSettings(),
-  ]);
+  const [posts, settings] = await Promise.all([getPostCards(), getSettings()]);
 
   /* A pinned post is moved to the front rather than duplicated — it still
    * appears exactly once, just first. */
@@ -54,10 +50,6 @@ export default async function BlogIndexPage() {
   return (
     <BlogIndex
       posts={pageSlice(ordered, 1)}
-      /* Empty topics are hidden from the index chips: a chip that leads to
-       * "no posts yet" is a promise the page can't keep. The hub still exists
-       * and is still reachable from /topics. */
-      topics={topics.filter((t) => t.postCount > 0)}
       settings={settings}
       page={1}
       totalPages={pageCount(ordered.length)}

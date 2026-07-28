@@ -16,7 +16,6 @@ import { pageCount } from "@/lib/pagination";
  * debugswift.com/<slug> — the wrong deployment entirely.
  *
  * What is deliberately ABSENT:
- *   · /search  — a page whose only content is an input box
  *   · /studio  — the CMS
  *   · /submit/* — tokened, single-use, private by construction
  *   · noindex posts — a page told not to be indexed should not be advertised

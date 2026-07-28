@@ -1,16 +1,15 @@
 import Image from "next/image";
-import Link from "next/link";
 import { BLOG_HERO } from "@/content";
 import CircuitPattern from "@/components/CircuitPattern";
 import Eyebrow from "@/components/Eyebrow";
 import JsonLd from "@/components/JsonLd";
 import Pagination from "@/components/Pagination";
-import PostCard from "@/components/PostCard";
+import PostGrid from "@/components/PostGrid";
 import SubscribeBlock from "@/components/SubscribeBlock";
 import type { BlogSettings } from "@/lib/content";
-import { BLOG, blogUrl, publicAsset } from "@/lib/links";
+import { blogUrl, publicAsset } from "@/lib/links";
 import { collectionPageJsonLd } from "@/lib/seo";
-import type { PostCard as PostCardType, Topic } from "@/lib/types";
+import type { PostCard as PostCardType } from "@/lib/types";
 
 /* The index, shared by /blog and /blog/page/[n].
  *
@@ -18,26 +17,24 @@ import type { PostCard as PostCardType, Topic } from "@/lib/types";
  * and the empty state have to stay in step, and the usual way they stop is one
  * of the two files getting a fix the other doesn't.
  *
- * The featured card only appears on page one. On page four it would be an
- * arbitrary post given twice the visual weight of the ones around it for no
- * reason a reader could work out. */
+ * Two things that used to be here have moved, on purpose:
+ *   · the topic chips are now components/TopicNav.tsx in the layout, so
+ *     categories are reachable from every blog page rather than only this one;
+ *   · search is now inside components/PostGrid.tsx, which replaced the separate
+ *     /blog/search route. */
 export default function BlogIndex({
   posts,
-  topics,
   settings,
   page,
   totalPages,
 }: {
   posts: PostCardType[];
-  topics: (Topic & { postCount: number })[];
   settings: BlogSettings;
   page: number;
   totalPages: number;
 }) {
   const isFirstPage = page === 1;
-  const featured = isFirstPage ? posts[0] : undefined;
-  const rest = isFirstPage ? posts.slice(1) : posts;
-  const url = page === 1 ? blogUrl("/") : blogUrl(`/page/${page}`);
+  const url = isFirstPage ? blogUrl("/") : blogUrl(`/page/${page}`);
 
   return (
     <main>
@@ -77,24 +74,6 @@ export default function BlogIndex({
                 {settings.title}
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-slate lg:mx-0">{settings.lede}</p>
-
-              {topics.length > 0 && (
-                <nav aria-label="Topics" className="mt-8">
-                  <ul className="flex flex-wrap justify-center gap-2 lg:justify-start">
-                    {topics.map((topic) => (
-                      <li key={topic.slug}>
-                        <Link
-                          href={BLOG.topic(topic.slug)}
-                          className="inline-flex items-center rounded-full border-[1.5px] border-ink px-4 py-2 text-small font-medium text-ink transition-colors duration-200 ease-out hover:bg-sand"
-                        >
-                          {topic.title}
-                          <span className="ml-2 text-stone">{topic.postCount}</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-              )}
             </div>
 
             {isFirstPage && (
@@ -137,23 +116,7 @@ export default function BlogIndex({
           </div>
         ) : (
           <>
-            {/* The page's ONE intentional grid break: the lead post spans the
-             * full canvas while everything under it sits in a three-column
-             * rhythm. */}
-            {featured && (
-              <div className="mb-10">
-                <PostCard post={featured} featured />
-              </div>
-            )}
-
-            {rest.length > 0 && (
-              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {rest.map((post) => (
-                  <PostCard key={post.slug} post={post} />
-                ))}
-              </div>
-            )}
-
+            <PostGrid posts={posts} showFeatured={isFirstPage} />
             <div className="mt-14">
               <Pagination page={page} total={totalPages} />
             </div>

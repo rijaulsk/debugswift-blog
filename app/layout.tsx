@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import StickyMobileBar from "@/components/StickyMobileBar";
+import TopicNav from "@/components/TopicNav";
 import { blogUrl, canonicalPath, SITE_URL } from "@/lib/links";
 import { CONTACT_EMAIL, SOCIALS } from "@/lib/site";
 import "./globals.css";
@@ -128,6 +129,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
         <Header />
+        {/* Blog-local navigation, under the site header on every route. The
+         * site Header is shared with the main deployment and has no room for
+         * five topics; this strip is what makes categories reachable from a
+         * post rather than only from the index. */}
+        <TopicNav />
         <div className="flex-1">{children}</div>
         <Footer />
         <StickyMobileBar />

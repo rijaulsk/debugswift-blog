@@ -17,10 +17,11 @@ import { CONTACT_EMAIL, SOCIALS, WHATSAPP_LINK } from "@/lib/site";
  *
  *   1. Main-site destinations are <MainSiteLink> (bare <a>). basePath "/blog"
  *      would make next/link render /blog/services. See components/MainSiteLink.tsx.
- *   2. The Pages column gains the blog's own sections — Topics, Search, Write
- *      for us — because in THIS deployment the reader is already inside the blog
- *      and the footer is the only place its structure is listed. On the main
- *      site those rows would be noise; here they're the local navigation.
+ *   2. The Pages column gains the blog's own sections — Topics and Write for
+ *      us — because in THIS deployment the reader is already inside the blog.
+ *      On the main site those rows would be noise; here they're local
+ *      navigation. (Search is not among them: it lives in the post list itself
+ *      now, not on a route of its own — see components/PostGrid.tsx.)
  */
 
 /* [label, href, isMainSite] */
@@ -35,7 +36,6 @@ const pages: [string, string, boolean][] = [
 
 const blogPages: [string, string][] = [
   ["All topics", BLOG.topics],
-  ["Search", BLOG.search],
   ["Write for us", BLOG.writeForUs],
 ];
 

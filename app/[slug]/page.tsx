@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AudioPlayer from "@/components/AudioPlayer";
 import AuthorBox from "@/components/AuthorBox";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Button from "@/components/Button";
@@ -13,7 +14,7 @@ import PostCard from "@/components/PostCard";
 import ShareRow from "@/components/ShareRow";
 import SubscribeBlock from "@/components/SubscribeBlock";
 import TableOfContents from "@/components/TableOfContents";
-import { getPost, getPostIndex, getRelatedPosts } from "@/lib/content";
+import { getPost, getPostIndex, getRelatedPosts, getTopics } from "@/lib/content";
 import { formatDate, isoDate } from "@/lib/format";
 import { BLOG, blogUrl, canonicalPath, MAIN, publicAsset } from "@/lib/links";
 import { extractHeadings } from "@/lib/portableText";
@@ -92,7 +93,12 @@ export default async function PostPage({ params }: Props) {
   if (!post) notFound();
 
   const headings = extractHeadings(post.body);
-  const related = await getRelatedPosts(post);
+  const [related, topics] = await Promise.all([
+    getRelatedPosts(post),
+    /* Only fetched to fill the "keep reading" section when there are no
+     * related posts to show — see the note on that section below. */
+    getTopics(),
+  ]);
   const url = blogUrl(`/${post.slug}`);
 
   return (
@@ -150,6 +156,15 @@ export default async function PostPage({ params }: Props) {
             <p className="text-eyebrow uppercase text-indigo-600">Short answer</p>
             <p className="mt-3 text-ink">{post.shortAnswer}</p>
           </div>
+
+          {/* Sits directly under the short answer, above the cover: someone who
+            * would rather listen should not have to scroll past a photograph
+            * and a table of contents to discover that they can. */}
+          {post.audio && (
+            <div className="mt-6 max-w-3xl">
+              <AudioPlayer audio={post.audio} />
+            </div>
+          )}
 
           {post.cover && (
             <figure className="mt-10">
@@ -271,21 +286,56 @@ export default async function PostPage({ params }: Props) {
         </div>
       </article>
 
-      {related.length > 0 && (
-        <section className="border-t-[1.5px] border-mist bg-sand">
-          <div className="mx-auto w-full max-w-canvas px-6 py-14 md:px-12 md:py-20">
-            <Eyebrow>Keep reading</Eyebrow>
-            <h2 className="mt-3 text-h2 text-ink">
-              {post.topic ? `More on ${post.topic.title.toLowerCase()}` : "More posts"}
-            </h2>
+      {/* Keep reading.
+        *
+        * This section used to disappear entirely when there was nothing to
+        * show, which is exactly when a reader most needs somewhere to go: with
+        * one post published, finishing it left a dead end. It now always
+        * renders — related posts when they exist, the topic list when they
+        * don't. A reader who got to the bottom is the most engaged one on the
+        * site, and handing them nothing is the worst moment to do it. */}
+      <section className="border-t-[1.5px] border-mist bg-sand">
+        <div className="mx-auto w-full max-w-canvas px-6 py-14 md:px-12 md:py-20">
+          <Eyebrow>Keep reading</Eyebrow>
+          <h2 className="mt-3 text-h2 text-ink">
+            {related.length > 0
+              ? post.topic
+                ? `More on ${post.topic.title.toLowerCase()}`
+                : "More posts"
+              : "Nothing else on this yet"}
+          </h2>
+
+          {related.length > 0 ? (
             <div className="mt-8 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {related.map((item) => (
                 <PostCard key={item.slug} post={item} />
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          ) : (
+            <>
+              <p className="mt-4 max-w-xl text-slate">
+                This is the first piece we&apos;ve published. Here&apos;s what
+                else is coming — pick the one that sounds like your week.
+              </p>
+              <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {topics.map((topic) => (
+                  <li key={topic.slug}>
+                    <Link
+                      href={BLOG.topic(topic.slug)}
+                      className="flex h-full flex-col rounded-card border-[1.5px] border-ink bg-paper p-5 transition-colors duration-200 ease-out hover:bg-cream"
+                    >
+                      <span className="font-medium text-ink">{topic.title}</span>
+                      <span className="mt-2 text-small text-slate">
+                        {topic.description}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      </section>
 
       <section className="mx-auto w-full max-w-canvas px-6 py-16 md:px-12 md:py-20">
         <SubscribeBlock location={`post:${post.slug}`} />

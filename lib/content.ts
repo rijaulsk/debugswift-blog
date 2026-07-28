@@ -80,6 +80,12 @@ type RawPost = {
   seoTitle?: string | null;
   seoDescription?: string | null;
   noindex?: boolean;
+  audio?: {
+    url?: string | null;
+    durationSeconds?: number | null;
+    voice?: string | null;
+    generatedAt?: string | null;
+  } | null;
 };
 
 /* A post whose author reference was deleted still has to render rather than
@@ -144,6 +150,16 @@ function mapPost(raw: RawPost): Post {
     body,
     faqs: raw.faqs ?? [],
     sources: raw.sources ?? [],
+    /* The object exists in Sanity as soon as any sub-field is touched, so the
+     * url is what decides whether there is really audio — not the object. */
+    audio: raw.audio?.url
+      ? {
+          url: raw.audio.url,
+          durationSeconds: raw.audio.durationSeconds ?? null,
+          voice: raw.audio.voice ?? null,
+          generatedAt: raw.audio.generatedAt ?? null,
+        }
+      : null,
     noindex: Boolean(raw.noindex),
     seoTitle: raw.seoTitle ?? null,
     seoDescription: raw.seoDescription ?? null,

@@ -102,6 +102,7 @@ export const BLOG = {
   topic: (slug: string) => `/topics/${slug}`,
   author: (slug: string) => `/authors/${slug}`,
   page: (n: number) => (n <= 1 ? "/" : `/page/${n}`),
-  search: "/search",
+  /* No `search` entry: search is a filter on the post list, not a route.
+   * See components/PostGrid.tsx. */
   writeForUs: "/write-for-us",
 } as const;

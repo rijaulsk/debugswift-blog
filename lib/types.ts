@@ -29,6 +29,15 @@ export type Link = { label: string; url: string };
 
 export type FaqItem = { question: string; answer: string };
 
+/** The spoken version of a post. Null when none has been produced. */
+export type PostAudio = {
+  url: string;
+  durationSeconds: number | null;
+  /** Shown to the reader. A synthetic voice is disclosed, never passed off. */
+  voice: string | null;
+  generatedAt: string | null;
+};
+
 export type Author = {
   slug: string;
   name: string;
@@ -77,6 +86,7 @@ export type Post = {
   faqs: FaqItem[];
   /** Attributable references. Models cite what carries provenance. */
   sources: Link[];
+  audio: PostAudio | null;
   isGuest: boolean;
   noindex: boolean;
   seoTitle: string | null;

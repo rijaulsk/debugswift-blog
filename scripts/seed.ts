@@ -170,7 +170,14 @@ async function main() {
   report("settings", localSettings.title, !settingsBefore);
 
   console.log(`\n  ${created} created, ${skipped} already present.`);
-  console.log(`\n  Next: open /blog/studio, add a Cloudinary cover to the post, publish.\n`);
+  console.log("\n  Next, in /blog/studio:");
+  console.log("    1. Add a Cloudinary cover to the post (and its alt text).");
+  console.log("    2. Fill in the Pre-publish checks tab — the originality check is");
+  console.log("       required and the post will not publish without it. Seeding writes");
+  console.log("       documents through the API, which bypasses validation, so this is");
+  console.log("       the one gate the script cannot close for you. It should not:");
+  console.log("       nobody has run that check yet.");
+  console.log("    3. Publish, then `npm run audio " + (localPosts[0]?.slug ?? "<slug>") + "`.\n");
 }
 
 main().catch((error: unknown) => {

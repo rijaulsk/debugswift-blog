@@ -157,6 +157,24 @@ export function blogPostingJsonLd(post: Post): JsonLdNode {
       "@type": "SpeakableSpecification",
       cssSelector: ["#short-answer"],
     },
+    /* A real recording of the article, declared as such. This is what lets a
+     * voice assistant or a podcast-style surface play the post rather than
+     * synthesise its own reading of the page, and it is a genuine
+     * differentiator: almost nothing in this space ships one. */
+    ...(post.audio
+      ? {
+          audio: {
+            "@type": "AudioObject",
+            contentUrl: post.audio.url,
+            encodingFormat: "audio/mpeg",
+            name: `${post.title} — spoken version`,
+            ...(post.audio.durationSeconds
+              ? { duration: `PT${Math.round(post.audio.durationSeconds)}S` }
+              : {}),
+            ...(post.audio.generatedAt ? { uploadDate: post.audio.generatedAt } : {}),
+          },
+        }
+      : {}),
   };
 }
 

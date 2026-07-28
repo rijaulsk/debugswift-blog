@@ -72,6 +72,11 @@ export const missingEnquiriesAtNight: Post = {
 
   sources: [],
 
+  /* No spoken version yet. `npm run audio <slug>` produces one once a TTS
+   * provider and Cloudinary credentials exist; until then the player simply
+   * doesn't render. */
+  audio: null,
+
   faqs: [
     {
       question: "Will customers be annoyed that a machine answered them?",
