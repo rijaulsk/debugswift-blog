@@ -21,9 +21,23 @@ import "./globals.css";
  * sameAs list — consistent, never contradictory. Search engines and LLMs
  * reconcile the two into one entity instead of inventing a second company.
  *
- * The WebSite node carries the SearchAction, which is what earns a sitelinks
- * search box, and every BlogPosting downstream points its publisher and
- * isPartOf at these two @ids. */
+ * Every BlogPosting downstream points its publisher and isPartOf at these two
+ * @ids.
+ *
+ * NO SearchAction on the WebSite node, and this is a correction rather than an
+ * omission. It used to carry one pointing at /blog/search?q={search_term_string},
+ * which is a URL that does not exist: search was deliberately turned into a
+ * client-side filter on the post list (see components/PostGrid.tsx), the route
+ * was deleted, and the marketing repo has already dropped /blog/search from its
+ * robots policy for the same reason.
+ *
+ * A SearchAction is a promise that a crawler can construct that URL and get
+ * results. Ours would have 404'd. Markup that describes a capability the site
+ * does not have is the kind that gets a rich result dropped, so it is gone.
+ *
+ * If a real search endpoint is ever built — the note in lib/pagination.ts says
+ * that becomes necessary once the archive outgrows one page — add the node back
+ * at the same time, not before. */
 const siteJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -43,14 +57,6 @@ const siteJsonLd = {
       name: "DebugSwift",
       publisher: { "@id": `${SITE_URL}/#org` },
       inLanguage: "en",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: {
-          "@type": "EntryPoint",
-          urlTemplate: `${blogUrl("/search")}?q={search_term_string}`,
-        },
-        "query-input": "required name=search_term_string",
-      },
     },
   ],
 };

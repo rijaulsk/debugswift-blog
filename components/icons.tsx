@@ -6,6 +6,12 @@
  * so one icon works on cream, indigo, or ink. Each caller supplies an
  * aria-label; the svg itself is aria-hidden. */
 
+import { publicAsset } from "@/lib/links";
+
+/** basePath-correct path to the mark, for use inside a CSS url() — see
+ *  DebugSwiftMark below for why that needs special handling. */
+const MARK_SRC = publicAsset("/brand/debugswift-icon-color.svg");
+
 type IconProps = { size?: number; className?: string };
 
 function Svg({
@@ -69,7 +75,19 @@ export function WhatsAppIcon(p: IconProps) {
 
 /* The DebugSwift icon mark, recoloured to the current text colour via CSS mask
  * (the source SVG is hard-filled indigo). Used in the footer, where the mark
- * must match the cream wordmark beside it. */
+ * must match the cream wordmark beside it.
+ *
+ * A FOURTH basePath trap, alongside the three in lib/links.ts. basePath is
+ * applied by next/link, the router, and the image optimizer — it is NOT applied
+ * to a URL inside a CSS value. `url(/brand/…)` therefore resolves against the
+ * domain root, where this deployment serves nothing, and the footer mark
+ * silently disappears.
+ *
+ * It goes through publicAsset() rather than a hand-typed "/blog/brand/…" for a
+ * specific reason: this file is copied between the three repos, and that literal
+ * prefix HAS been written here before and was overwritten by a re-copy, taking
+ * the fix with it. A computed call reads the right prefix for whichever repo it
+ * lands in and survives the next bulk copy. Do not "simplify" it back. */
 export function DebugSwiftMark({
   className,
   width = 21,
@@ -90,8 +108,8 @@ export function DebugSwiftMark({
          * parent's text colour. This project resets --color-* to initial, which
          * removes Tailwind's `bg-current` utility — hence the inline style. */
         backgroundColor: "currentColor",
-        maskImage: "url(/brand/debugswift-icon-color.svg)",
-        WebkitMaskImage: "url(/brand/debugswift-icon-color.svg)",
+        maskImage: `url(${MARK_SRC})`,
+        WebkitMaskImage: `url(${MARK_SRC})`,
         maskSize: "contain",
         WebkitMaskSize: "contain",
         maskRepeat: "no-repeat",
