@@ -87,7 +87,25 @@ const nextConfig: NextConfig = {
   },
 
   async redirects() {
-    return slugRedirects();
+    return [
+      /* The root of THIS deployment.
+       *
+       * basePath means this app serves nothing at "/", so hitting the origin
+       * root produced a 404 — confusing in local dev (localhost:3000 looks
+       * broken until you remember to type /blog) and wrong on the raw Vercel
+       * origin, which has no reason to be a dead end.
+       *
+       * In production nobody reaches this: debugswift.com/ is the main site and
+       * only /blog/* is proxied here. So it costs nothing and fixes both of the
+       * places it does show up.
+       *
+       * basePath:false is required — without it Next would prefix the source
+       * and this would mean /blog -> /blog/blog. Temporary rather than
+       * permanent: the origin root is not a canonical URL and a 308 would sit
+       * in browser caches long after any change to this setup. */
+      { source: "/", destination: "/blog", permanent: false, basePath: false as const },
+      ...(await slugRedirects()),
+    ];
   },
 };
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Eyebrow from "@/components/Eyebrow";
+import FaqList from "@/components/FaqList";
 import JsonLd from "@/components/JsonLd";
 import PitchForm from "@/components/PitchForm";
 import { blogUrl, canonicalPath, siteUrl } from "@/lib/links";
@@ -139,23 +140,10 @@ export default function WriteForUsPage() {
           </section>
 
           <section className="rounded-card border-[1.5px] border-ink bg-sand p-6">
-            <p className="text-eyebrow uppercase text-indigo-600">Common questions</p>
-            <div className="mt-4 divide-y-[1.5px] divide-mist border-y-[1.5px] border-mist">
-              {faqs.map((faq) => (
-                <details key={faq.question} className="group py-4">
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-medium text-ink marker:hidden">
-                    {faq.question}
-                    <span
-                      aria-hidden="true"
-                      className="mt-1 shrink-0 text-indigo-600 transition-transform duration-200 ease-out group-open:rotate-45"
-                    >
-                      +
-                    </span>
-                  </summary>
-                  <p className="mt-3 text-small text-slate">{faq.answer}</p>
-                </details>
-              ))}
-            </div>
+            {/* Same component as the post pages — and the same reason: these
+              * five questions are compiled into this page's FAQPage structured
+              * data, so they have to be the questions a reader can see. */}
+            <FaqList items={faqs} />
           </section>
         </aside>
       </div>

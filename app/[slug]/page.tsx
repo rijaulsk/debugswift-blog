@@ -6,6 +6,7 @@ import AuthorBox from "@/components/AuthorBox";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Button from "@/components/Button";
 import Eyebrow from "@/components/Eyebrow";
+import FaqList from "@/components/FaqList";
 import JsonLd from "@/components/JsonLd";
 import PostBody from "@/components/PostBody";
 import PostCard from "@/components/PostCard";
@@ -191,6 +192,24 @@ export default async function PostPage({ params }: Props) {
               )}
 
               <PostBody value={post.body} isGuest={post.author.isGuest} />
+
+              {/* The post's closing FAQ array.
+                *
+                * This MUST render. lib/seo.ts compiles it into the FAQPage
+                * structured data together with any faqBlock in the body, and
+                * Google's rule is that FAQ markup describes questions the
+                * reader can see. Leaving it out advertised five questions and
+                * showed two — the kind of mismatch that gets a rich result
+                * pulled rather than merely ignored. */}
+              {post.faqs.length > 0 && (
+                <section aria-labelledby="post-faqs" className="mt-14">
+                  <FaqList
+                    items={post.faqs}
+                    heading="Still wondering"
+                    headingId="post-faqs"
+                  />
+                </section>
+              )}
 
               {post.sources.length > 0 && (
                 <section aria-labelledby="sources" className="mt-14 border-t-[1.5px] border-mist pt-8">

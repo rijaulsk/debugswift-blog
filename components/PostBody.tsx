@@ -4,6 +4,7 @@ import {
   type PortableTextMarkComponentProps,
 } from "@portabletext/react";
 import Image from "next/image";
+import FaqList from "@/components/FaqList";
 import { cloudinaryUrl, type CloudinaryAsset } from "@/sanity/lib/cloudinary";
 import { headingId } from "@/lib/portableText";
 import { MAIN, publicAsset, SITE_URL } from "@/lib/links";
@@ -184,25 +185,7 @@ export default function PostBody({ value, isGuest = false }: Props) {
 
       faqBlock: ({ value }) => (
         <div className="mt-12">
-          <p className="text-eyebrow uppercase text-indigo-600">Common questions</p>
-          <div className="mt-4 divide-y-[1.5px] divide-mist border-y-[1.5px] border-mist">
-            {(value.items ?? []).map(
-              (item: { _key?: string; question: string; answer: string }) => (
-                <details key={item._key ?? item.question} className="group py-4">
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-medium text-ink marker:hidden">
-                    {item.question}
-                    <span
-                      aria-hidden="true"
-                      className="mt-1 shrink-0 text-indigo-600 transition-transform duration-200 ease-out group-open:rotate-45"
-                    >
-                      +
-                    </span>
-                  </summary>
-                  <p className="mt-3 text-slate">{item.answer}</p>
-                </details>
-              ),
-            )}
-          </div>
+          <FaqList items={value.items ?? []} />
         </div>
       ),
 
