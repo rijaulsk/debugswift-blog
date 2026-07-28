@@ -172,6 +172,10 @@ So you know what will stop you publishing, and what is only advice:
 | Topic and author set | both | **Yes** |
 | Alt text when there's a cover | cover alt | **Yes** |
 
+These fire inside the Studio. The local content in `content/` never passes through
+Sanity, and `npm run seed` writes via the API, which does not validate — so
+`npm run check-content` runs the same rules over `content/` from the command line.
+
 ---
 
 ## 5. After the writing
