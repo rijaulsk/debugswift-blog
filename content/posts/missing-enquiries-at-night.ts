@@ -218,8 +218,12 @@ export const missingEnquiriesAtNight: Post = {
     para(
       "If the answer is nothing, good — this is not your bug, and you have just saved yourself a purchase. If the answer is three messages and the oldest one has been waiting eleven hours, you have found something worth fixing, and you found it in about ninety seconds.",
     ),
+    /* The closing CTA is in the BODY, not only in the page's CTA card. The card
+     * is chrome and doesn't appear in /md/<slug>, the RSS feed or
+     * llms-full.txt — so a post whose only next step lived there would reach a
+     * feed reader, or a model, with no next step at all. */
     para(
-      "The [Lead Engine](https://debugswift.com/lead-engine) is our packaged version of that fix — one channel, live in 7 days. If you would rather work out whether it is the right fix at all, the diagnosis call does that first, and costs nothing.",
+      "The [Lead Engine](https://debugswift.com/lead-engine) is our packaged version of that fix — one channel, live in 7 days. If you would rather find out whether it is the right fix at all, [the free diagnosis](https://debugswift.com/contact#diagnosis) answers that first, and costs nothing either way.",
     ),
 
     faqBlock([
