@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import { BLOG_HERO } from "@/content";
 import CircuitPattern from "@/components/CircuitPattern";
 import Eyebrow from "@/components/Eyebrow";
 import JsonLd from "@/components/JsonLd";
@@ -6,7 +8,7 @@ import Pagination from "@/components/Pagination";
 import PostCard from "@/components/PostCard";
 import SubscribeBlock from "@/components/SubscribeBlock";
 import type { BlogSettings } from "@/lib/content";
-import { BLOG, blogUrl } from "@/lib/links";
+import { BLOG, blogUrl, publicAsset } from "@/lib/links";
 import { collectionPageJsonLd } from "@/lib/seo";
 import type { PostCard as PostCardType, Topic } from "@/lib/types";
 
@@ -54,33 +56,66 @@ export default function BlogIndex({
       />
 
       {/* Hero. Circuit motif at ≤8%, no clay — the only clay in this page's
-       * first viewport would otherwise fight the subscribe CTA further down. */}
+       * first viewport would otherwise fight the subscribe CTA further down.
+       *
+       * The photograph appears on page one only. On page four it is decoration
+       * the reader has already scrolled past, taking the space the posts they
+       * came back for should occupy. */}
       <section className="relative overflow-hidden border-b-[1.5px] border-mist">
         <CircuitPattern opacity={0.07} />
         <div className="relative mx-auto w-full max-w-canvas px-6 pt-16 pb-12 text-center md:px-12 md:pt-24 md:pb-16 lg:text-left">
-          <Eyebrow>{isFirstPage ? "The blog" : `Page ${page}`}</Eyebrow>
-          <h1 className="mx-auto mt-4 max-w-3xl text-h1-mobile text-ink md:text-h1 lg:mx-0">
-            {settings.title}
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-slate lg:mx-0">{settings.lede}</p>
+          <div
+            className={
+              isFirstPage
+                ? "grid items-center gap-x-16 gap-y-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+                : undefined
+            }
+          >
+            <div>
+              <Eyebrow>{isFirstPage ? "The blog" : `Page ${page}`}</Eyebrow>
+              <h1 className="mx-auto mt-4 max-w-3xl text-h1-mobile text-ink md:text-h1 lg:mx-0">
+                {settings.title}
+              </h1>
+              <p className="mx-auto mt-5 max-w-2xl text-slate lg:mx-0">{settings.lede}</p>
 
-          {topics.length > 0 && (
-            <nav aria-label="Topics" className="mt-8">
-              <ul className="flex flex-wrap justify-center gap-2 lg:justify-start">
-                {topics.map((topic) => (
-                  <li key={topic.slug}>
-                    <Link
-                      href={BLOG.topic(topic.slug)}
-                      className="inline-flex items-center rounded-full border-[1.5px] border-ink px-4 py-2 text-small font-medium text-ink transition-colors duration-200 ease-out hover:bg-sand"
-                    >
-                      {topic.title}
-                      <span className="ml-2 text-stone">{topic.postCount}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
+              {topics.length > 0 && (
+                <nav aria-label="Topics" className="mt-8">
+                  <ul className="flex flex-wrap justify-center gap-2 lg:justify-start">
+                    {topics.map((topic) => (
+                      <li key={topic.slug}>
+                        <Link
+                          href={BLOG.topic(topic.slug)}
+                          className="inline-flex items-center rounded-full border-[1.5px] border-ink px-4 py-2 text-small font-medium text-ink transition-colors duration-200 ease-out hover:bg-sand"
+                        >
+                          {topic.title}
+                          <span className="ml-2 text-stone">{topic.postCount}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              )}
+            </div>
+
+            {isFirstPage && (
+              <figure className="mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
+                <Image
+                  src={publicAsset(BLOG_HERO.src)}
+                  alt={BLOG_HERO.alt}
+                  width={BLOG_HERO.width}
+                  height={BLOG_HERO.height}
+                  /* LCP candidate on the index — the cards below are lazy,
+                   * this one is not. */
+                  priority
+                  sizes="(max-width: 1024px) 90vw, 520px"
+                  className="w-full rounded-card border-[1.5px] border-ink object-cover"
+                />
+                <figcaption className="mt-3 text-small text-slate">
+                  {BLOG_HERO.caption}
+                </figcaption>
+              </figure>
+            )}
+          </div>
         </div>
       </section>
 

@@ -50,11 +50,14 @@ export const missingEnquiriesAtNight: Post = {
     "Answering fast does not require hiring anyone, and it does not require pretending a human is on the other end.",
   ],
 
+  /* 1400x933 is the file's real intrinsic size, not a guess — next/image needs
+   * it exactly or the reserved space is the wrong shape and the layout shifts
+   * when the image lands. */
   cover: localImage(
     "/photos/whatsapp-lead-engine-phone-checklist.webp",
     "A phone showing a WhatsApp enquiry thread, resting on a handwritten checklist of jobs to reply to",
-    1600,
-    1067,
+    1400,
+    933,
   ),
 
   publishedAt: "2026-07-28T09:00:00.000Z",

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatDate, isoDate } from "@/lib/format";
-import { BLOG } from "@/lib/links";
+import { BLOG, publicAsset } from "@/lib/links";
 import type { PostCard as PostCardType } from "@/lib/types";
 
 /* A post in a listing.
@@ -28,7 +28,7 @@ export default function PostCard({
       {post.cover && (
         <div className={featured ? "md:w-1/2 md:shrink-0" : ""}>
           <Image
-            src={post.cover.src}
+            src={publicAsset(post.cover.src)}
             alt={post.cover.alt}
             width={post.cover.width}
             height={post.cover.height}

@@ -6,7 +6,7 @@ import {
 import Image from "next/image";
 import { cloudinaryUrl, type CloudinaryAsset } from "@/sanity/lib/cloudinary";
 import { headingId } from "@/lib/portableText";
-import { MAIN, SITE_URL } from "@/lib/links";
+import { MAIN, publicAsset, SITE_URL } from "@/lib/links";
 import { getService } from "@/lib/nav";
 import type { BodyBlock } from "@/lib/types";
 
@@ -148,7 +148,10 @@ export default function PostBody({ value, isGuest = false }: Props) {
         return (
           <figure className="mt-10">
             <Image
-              src={cloudinaryUrl(asset.public_id, { width: 1400 })}
+              /* Cloudinary returns an absolute URL, which publicAsset passes
+               * through untouched — wrapped anyway so the rule is uniform and
+               * a future local figure can't reintroduce the basePath bug. */
+              src={publicAsset(cloudinaryUrl(asset.public_id, { width: 1400 }))}
               alt={value.alt ?? ""}
               width={asset.width ?? 1400}
               height={asset.height ?? 933}

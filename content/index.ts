@@ -17,6 +17,21 @@ export { localTopics } from "@/content/topics";
  * what lets a fresh clone of this repo run with no accounts at all. */
 export const localPosts: Post[] = [missingEnquiriesAtNight];
 
+/* The blog's own photograph, carried over from the coming-soon page it used to
+ * front in the main repo (E:\debugswift\app\blog\page.tsx). Alt text is that
+ * page's approved wording, unchanged — it describes the same image.
+ *
+ * Dimensions are the file's real intrinsic size. Used in two places that must
+ * agree: the index hero and the index's Open Graph card. */
+export const BLOG_HERO = {
+  src: "/photos/debugswift-blog-drafts-desk.webp",
+  alt: "A notebook sketching the blog's structure — intro, key idea, sections — beside a clipped stack of typed drafts",
+  width: 1400,
+  height: 933,
+  caption:
+    "Practical guides, real examples, simple explanations. Written for the person running the business.",
+};
+
 export const localSettings = {
   title: "The DebugSwift blog",
   lede: "Plain-language write-ups on what technology is worth paying for, what isn't, and how to tell the difference — written for people running a business, not for other agencies.",

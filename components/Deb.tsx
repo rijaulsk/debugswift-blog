@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { publicAsset } from "@/lib/links";
 
 /* Deb — the mascot, in one place.
  *
@@ -60,7 +61,9 @@ export default function Deb({
 
   return (
     <Image
-      src={src}
+      /* /deb/*.png lives in this deployment's /public, so it needs the basePath
+       * the optimizer's url parameter would otherwise drop — see publicAsset. */
+      src={publicAsset(src)}
       alt={alt}
       width={width}
       height={width}

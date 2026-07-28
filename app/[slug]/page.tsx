@@ -14,7 +14,7 @@ import SubscribeBlock from "@/components/SubscribeBlock";
 import TableOfContents from "@/components/TableOfContents";
 import { getPost, getPostIndex, getRelatedPosts } from "@/lib/content";
 import { formatDate, isoDate } from "@/lib/format";
-import { BLOG, blogUrl, canonicalPath, MAIN } from "@/lib/links";
+import { BLOG, blogUrl, canonicalPath, MAIN, publicAsset } from "@/lib/links";
 import { extractHeadings } from "@/lib/portableText";
 import { breadcrumbsFor, ogImageFor, postGraph } from "@/lib/seo";
 
@@ -153,7 +153,7 @@ export default async function PostPage({ params }: Props) {
           {post.cover && (
             <figure className="mt-10">
               <Image
-                src={post.cover.src}
+                src={publicAsset(post.cover.src)}
                 alt={post.cover.alt}
                 width={post.cover.width}
                 height={post.cover.height}

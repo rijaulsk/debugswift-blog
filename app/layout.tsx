@@ -82,6 +82,12 @@ export const metadata: Metadata = {
   },
   description:
     "Plain-language write-ups on what technology is worth paying for, what isn't, and how to tell the difference. Written for owners of small and mid-sized businesses by the people who build the fixes.",
+  /* The MAIN site's manifest, at the domain root. This repo deliberately ships
+   * no manifest.ts: one domain gets one web app manifest, and a second one at
+   * /blog/manifest.webmanifest would give the same site two different names and
+   * icon sets depending on which page it was added to the home screen from.
+   * Metadata URLs skip basePath, so this resolves to debugswift.com/... */
+  manifest: "/manifest.webmanifest",
   alternates: {
     canonical: canonicalPath("/"),
     types: {

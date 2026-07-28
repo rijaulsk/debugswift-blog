@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import BlogIndex from "@/components/BlogIndex";
+import { BLOG_HERO } from "@/content";
 import { getPostCards, getSettings, getTopics } from "@/lib/content";
-import { canonicalPath } from "@/lib/links";
+import { blogUrl, canonicalPath } from "@/lib/links";
 import { pageCount, pageSlice } from "@/lib/pagination";
 
 /* The blog index, served at /blog (basePath does the prefixing).
@@ -19,6 +20,17 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       title: settings.title,
       description: settings.description,
+      /* The blog's own photo rather than the site-wide og.png — a share of the
+       * index should look like the blog, not like the homepage. Absolute, and
+       * under /blog, because metadata URLs skip basePath. */
+      images: [
+        {
+          url: blogUrl("/photos/debugswift-blog-drafts-desk.webp"),
+          width: 1400,
+          height: 933,
+          alt: BLOG_HERO.alt,
+        },
+      ],
     },
   };
 }

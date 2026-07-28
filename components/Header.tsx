@@ -4,6 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+/* STATIC IMPORT, not a "/brand/..." string, and this is a basePath bug fix.
+ *
+ * next/image sends raster images through /_next/image, and that optimizer URL
+ * correctly picks up the basePath. SVG bypasses the optimizer entirely and the
+ * raw src is emitted verbatim — so src="/brand/debugswift-icon-color.svg"
+ * shipped WITHOUT the /blog prefix and resolved to the main site's path, which
+ * has no such file. The mark 404'd and the header rendered as bare "DebugSwift"
+ * text with a hole where the logo should be.
+ *
+ * A static import is bundled to /blog/_next/static/media/..., which carries the
+ * prefix. Any other SVG rendered through next/image in this repo must be
+ * imported the same way. */
+import brandMark from "@/public/brand/debugswift-icon-color.svg";
 import { variantClasses } from "@/components/Button";
 import MainSiteLink from "@/components/MainSiteLink";
 import { BLOG, MAIN } from "@/lib/links";
@@ -112,13 +125,7 @@ export default function Header() {
           aria-label="DebugSwift home"
           className="flex shrink-0 items-center gap-2"
         >
-          <Image
-            src="/brand/debugswift-icon-color.svg"
-            alt=""
-            width={24}
-            height={32}
-            priority
-          />
+          <Image src={brandMark} alt="" width={24} height={32} priority />
           <span className="text-[20px] font-bold text-indigo-500">
             DebugSwift
           </span>

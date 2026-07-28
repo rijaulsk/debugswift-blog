@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BLOG } from "@/lib/links";
+import { BLOG, publicAsset } from "@/lib/links";
 import type { Author } from "@/lib/types";
 
 /* The byline block at the foot of a post.
@@ -26,7 +26,7 @@ export default function AuthorBox({ author }: { author: Author }) {
       <div className="mt-4 flex items-start gap-4">
         {author.photo ? (
           <Image
-            src={author.photo.src}
+            src={publicAsset(author.photo.src)}
             alt={author.photo.alt}
             width={56}
             height={56}

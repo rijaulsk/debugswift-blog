@@ -33,6 +33,33 @@ export function siteUrl(path = "/"): string {
   return `${SITE_URL}${path === "/" ? "" : path}`;
 }
 
+/**
+ * A file in /public, as next/image needs to see it.
+ *
+ * THIRD basePath trap, and the one that breaks silently in production only.
+ * next/image turns a local src into `/blog/_next/image?url=%2Fphotos%2Fx.webp`.
+ * The route carries the basePath but the `url` parameter does NOT, and the
+ * optimizer resolves that parameter by fetching it from its own server — where
+ * `/photos/x.webp` is a 404, because everything this deployment serves lives
+ * under /blog. The optimizer then answers 400 "The requested resource isn't a
+ * valid image" and every local image on the site is broken.
+ *
+ * Confirmed against `next start`: url=%2Fblog%2Fphotos%2Fx.webp returns the
+ * image, url=%2Fphotos%2Fx.webp returns 400.
+ *
+ * So local paths get the prefix here, at the point they meet next/image, while
+ * ImageRef.src stays the raw public path everywhere else (the OG builder in
+ * lib/seo.ts needs the unprefixed form to compose an absolute URL).
+ *
+ * Safe to wrap anything: remote URLs and already-prefixed paths pass through
+ * untouched, so a cover that came from Cloudinary is unaffected.
+ */
+export function publicAsset(src: string): string {
+  if (/^https?:\/\//.test(src) || src.startsWith("data:")) return src;
+  if (src === BLOG_BASE || src.startsWith(`${BLOG_BASE}/`)) return src;
+  return `${BLOG_BASE}${src.startsWith("/") ? src : `/${src}`}`;
+}
+
 /** Canonical path for post metadata. Next resolves `alternates.canonical`
  *  against metadataBase and does NOT add basePath, so this must carry it. */
 export function canonicalPath(path = "/"): string {
