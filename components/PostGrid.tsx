@@ -69,7 +69,7 @@ export default function PostGrid({
             className="w-full rounded-full border-[1.5px] border-ink bg-paper px-5 py-3 text-ink placeholder:text-stone focus:outline-none focus-visible:border-indigo-600"
           />
         </div>
-        <p aria-live="polite" className="text-small text-stone">
+        <p aria-live="polite" className="text-small text-slate">
           {searching
             ? `${results.length} of ${posts.length} post${posts.length === 1 ? "" : "s"}`
             : `${posts.length} post${posts.length === 1 ? "" : "s"}`}

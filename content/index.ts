@@ -1,5 +1,7 @@
 import type { Post } from "@/lib/types";
+import { isThisAgencyQuoteTooHigh } from "@/content/posts/is-this-agency-quote-too-high";
 import { missingEnquiriesAtNight } from "@/content/posts/missing-enquiries-at-night";
+import { spreadsheetKeepsBreaking } from "@/content/posts/spreadsheet-keeps-breaking";
 
 export { localAuthors } from "@/content/authors";
 export { localTopics } from "@/content/topics";
@@ -15,7 +17,18 @@ export { localTopics } from "@/content/topics";
  * `npm run seed` pushes these documents into Sanity, after which this folder is
  * a historical record rather than a live source. It is kept, not deleted: it is
  * what lets a fresh clone of this repo run with no accounts at all. */
-export const localPosts: Post[] = [missingEnquiriesAtNight];
+/* Three posts, which is the launch bar from debugswift-assets/blog-repo-spec.md:
+ * "the coming-soon page stays up until there are 3 posts worth someone's time —
+ * never launch with one thin post". They sit in three different topics on
+ * purpose, so the topic navigation and the related-posts logic are exercised by
+ * real content rather than by a single entry.
+ *
+ * Order here is irrelevant — lib/content.ts sorts by publishedAt. */
+export const localPosts: Post[] = [
+  missingEnquiriesAtNight,
+  spreadsheetKeepsBreaking,
+  isThisAgencyQuoteTooHigh,
+];
 
 /* The blog's own photograph, carried over from the coming-soon page it used to
  * front in the main repo (E:\debugswift\app\blog\page.tsx). Alt text is that

@@ -69,7 +69,7 @@ export default function PostCard({
 
         <p className="mt-3 flex-1 text-small text-slate">{post.excerpt}</p>
 
-        <p className="mt-5 text-small text-stone">
+        <p className="mt-5 text-small text-slate">
           <time dateTime={isoDate(post.publishedAt)}>
             {formatDate(post.publishedAt)}
           </time>

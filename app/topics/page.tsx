@@ -53,7 +53,7 @@ export default async function TopicsPage() {
             >
               <p className="text-h3 text-ink">{topic.title}</p>
               <p className="mt-3 flex-1 text-small text-slate">{topic.description}</p>
-              <p className="mt-5 text-small text-stone">
+              <p className="mt-5 text-small text-slate">
                 {topic.postCount === 0
                   ? "Nothing published yet"
                   : `${topic.postCount} post${topic.postCount === 1 ? "" : "s"}`}

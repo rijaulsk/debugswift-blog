@@ -105,7 +105,7 @@ export default function DraftForm({
         <label htmlFor="draft-body" className={labelClass}>
           The draft
         </label>
-        <p className="mt-1 text-small text-stone">
+        <p className="mt-1 text-small text-slate">
           Plain text or markdown. <code>##</code> for headings, <code>-</code> for
           bullets. Don&apos;t worry about formatting beyond that — we handle the
           rest.
@@ -119,7 +119,7 @@ export default function DraftForm({
           onChange={(e) => setWords(e.target.value.split(/\s+/).filter(Boolean).length)}
           className={`${fieldClass} font-mono text-small`}
         />
-        <p className="mt-2 text-small text-stone">
+        <p className="mt-2 text-small text-slate">
           {words} words
           {words > 0 && words < 800 && " — aiming for 800–1,500"}
           {words > 1500 && " — over 1,500, consider cutting"}
@@ -143,7 +143,7 @@ export default function DraftForm({
         <label htmlFor="draft-bio" className={labelClass}>
           Author bio
         </label>
-        <p className="mt-1 text-small text-stone">
+        <p className="mt-1 text-small text-slate">
           Two or three sentences: who you are and why you can speak to this.
           Links in here are nofollow, as agreed.
         </p>

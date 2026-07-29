@@ -11,10 +11,17 @@ import FaqList from "@/components/FaqList";
 import JsonLd from "@/components/JsonLd";
 import PostBody from "@/components/PostBody";
 import PostCard from "@/components/PostCard";
+import PostNav from "@/components/PostNav";
 import ShareRow from "@/components/ShareRow";
 import SubscribeBlock from "@/components/SubscribeBlock";
 import TableOfContents from "@/components/TableOfContents";
-import { getPost, getPostIndex, getRelatedPosts, getTopics } from "@/lib/content";
+import {
+  getAdjacentPosts,
+  getPost,
+  getPostIndex,
+  getRelatedPosts,
+  getTopics,
+} from "@/lib/content";
 import { formatDate, isoDate } from "@/lib/format";
 import { BLOG, blogUrl, canonicalPath, MAIN, publicAsset } from "@/lib/links";
 import { extractHeadings } from "@/lib/portableText";
@@ -93,11 +100,12 @@ export default async function PostPage({ params }: Props) {
   if (!post) notFound();
 
   const headings = extractHeadings(post.body);
-  const [related, topics] = await Promise.all([
+  const [related, topics, adjacent] = await Promise.all([
     getRelatedPosts(post),
     /* Only fetched to fill the "keep reading" section when there are no
      * related posts to show — see the note on that section below. */
     getTopics(),
+    getAdjacentPosts(post.slug),
   ]);
   const url = blogUrl(`/${post.slug}`);
 
@@ -121,7 +129,7 @@ export default async function PostPage({ params }: Props) {
 
             <h1 className="mt-4 text-h1-mobile text-ink md:text-h1">{post.title}</h1>
 
-            <p className="mt-6 text-small text-stone">
+            <p className="mt-6 text-small text-slate">
               By{" "}
               <Link
                 href={BLOG.author(post.author.slug)}
@@ -187,6 +195,13 @@ export default async function PostPage({ params }: Props) {
         <div className="mx-auto w-full max-w-canvas px-6 py-12 md:px-12 md:py-16">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]">
             <div className="min-w-0 max-w-2xl">
+              {/* Contents, for the readers the sidebar never reached. The
+                * sidebar below is lg-and-up only, so on a phone this was the
+                * difference between having a table of contents and not. */}
+              <div className="mb-10 lg:hidden">
+                <TableOfContents headings={headings} variant="collapsed" />
+              </div>
+
               {post.keyTakeaways.length > 0 && (
                 <section
                   aria-labelledby="takeaways"
@@ -271,6 +286,13 @@ export default async function PostPage({ params }: Props) {
 
               <div className="mt-10">
                 <AuthorBox author={post.author} />
+              </div>
+
+              {/* Sequence, not similarity — the related grid below covers
+                * "more like this". This is what stops any post being a dead
+                * end, including ones stranded behind pagination. */}
+              <div className="mt-10">
+                <PostNav previous={adjacent.previous} next={adjacent.next} />
               </div>
             </div>
 

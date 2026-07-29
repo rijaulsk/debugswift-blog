@@ -126,7 +126,7 @@ export default function PitchForm() {
         <label htmlFor="pitch-topic" className={labelClass}>
           The question your post answers
         </label>
-        <p className="mt-1 text-small text-stone">
+        <p className="mt-1 text-small text-slate">
           Phrased the way an owner would ask it. &ldquo;Why does my spreadsheet
           keep breaking?&rdquo; — not &ldquo;5 productivity hacks&rdquo;.
         </p>
@@ -143,7 +143,7 @@ export default function PitchForm() {
         <label htmlFor="pitch-angle" className={labelClass}>
           What you&apos;d argue, and why you can
         </label>
-        <p className="mt-1 text-small text-stone">
+        <p className="mt-1 text-small text-slate">
           A paragraph or two. The specific thing you know that most people
           writing about this don&apos;t.
         </p>
@@ -166,7 +166,7 @@ export default function PitchForm() {
 
       <fieldset>
         <legend className={labelClass}>Something you&apos;ve published</legend>
-        <p className="mt-1 text-small text-stone">
+        <p className="mt-1 text-small text-slate">
           Up to three links. Anything you wrote — it doesn&apos;t have to be
           about this.
         </p>

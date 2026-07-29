@@ -30,7 +30,7 @@ export default function AudioPlayer({ audio }: { audio: PostAudio }) {
           Listen instead
         </p>
         {minutes && (
-          <p className="text-small text-stone">{minutes} min</p>
+          <p className="text-small text-slate">{minutes} min</p>
         )}
       </div>
 
@@ -47,7 +47,7 @@ export default function AudioPlayer({ audio }: { audio: PostAudio }) {
       </audio>
 
       {audio.voice && (
-        <p className="mt-3 text-small text-stone">
+        <p className="mt-3 text-small text-slate">
           Read by {audio.voice}.
         </p>
       )}

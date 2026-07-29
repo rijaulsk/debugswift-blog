@@ -52,8 +52,16 @@ export default async function TopicNav() {
                 className={`${itemClass} border-mist text-slate hover:border-ink hover:text-ink`}
               >
                 {topic.title}
+                {/* Slate, not Stone. Stone on Cream measures 2.24:1, which
+                 * fails WCAG AA at every text size — and this count is real
+                 * information, not decoration. Stone stays for placeholders
+                 * and genuinely decorative marks only.
+                 *
+                 * The comment sits OUTSIDE the && expression: a {\/* *\/} block
+                 * inside `cond && ( … )` is parsed as an object literal, not a
+                 * comment, and fails the build. */}
                 {topic.postCount > 0 && (
-                  <span className="ml-2 text-stone">{topic.postCount}</span>
+                  <span className="ml-2 text-slate">{topic.postCount}</span>
                 )}
               </Link>
             </li>

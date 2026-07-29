@@ -333,6 +333,32 @@ export async function getAuthorSlugs(): Promise<string[]> {
 }
 
 /**
+ * The posts either side of this one, in publication order.
+ *
+ * Different job from related posts, which is why both exist. Related answers
+ * "more like this"; this answers "what else is there", and it is the one that
+ * gives an archive a sense of sequence rather than a pile. It also guarantees
+ * every post is reachable from its neighbours, so nothing is ever orphaned
+ * behind pagination.
+ *
+ * `previous` is the older post and `next` is the newer one — the direction a
+ * reader working through an archive travels, not the direction the array is
+ * sorted in.
+ */
+export async function getAdjacentPosts(
+  slug: string,
+): Promise<{ previous: PostCard | null; next: PostCard | null }> {
+  const all = await getPostCards();
+  const index = all.findIndex((p) => p.slug === slug);
+  if (index === -1) return { previous: null, next: null };
+  return {
+    /* all[] is newest-first, so the NEXT entry is the OLDER post. */
+    previous: all[index + 1] ?? null,
+    next: all[index - 1] ?? null,
+  };
+}
+
+/**
  * Related posts: same topic first, newest elsewhere to fill.
  *
  * Always returns something. An empty "keep reading" block on a young blog is a

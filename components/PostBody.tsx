@@ -31,6 +31,25 @@ type Props = {
   isGuest?: boolean;
 };
 
+/* The link that appears beside a heading on hover or keyboard focus.
+ *
+ * The ids were already there — they are what earns "jump to section" links in a
+ * search result — but nothing let a reader link to one, which is the other half
+ * of the same idea: someone quoting a specific section should be able to point
+ * at it. It stays focusable and labelled rather than aria-hidden, because a
+ * keyboard user has exactly the same need as a mouse user here. */
+function HeadingAnchor({ id }: { id: string }) {
+  return (
+    <a
+      href={`#${id}`}
+      aria-label="Link to this section"
+      className="ml-2 align-middle text-[0.7em] font-normal text-indigo-500 opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 focus-visible:opacity-100"
+    >
+      #
+    </a>
+  );
+}
+
 function isExternal(href: string): boolean {
   if (href.startsWith("/") || href.startsWith("#")) return false;
   if (href.startsWith("mailto:") || href.startsWith("tel:")) return false;
@@ -66,16 +85,18 @@ export default function PostBody({ value, isGuest = false }: Props) {
       h2: ({ children }) => {
         const id = idFor(textOf(children));
         return (
-          <h2 id={id} className="mt-14 scroll-mt-28 text-h2 text-ink">
+          <h2 id={id} className="group mt-14 scroll-mt-28 text-h2 text-ink">
             {children}
+            <HeadingAnchor id={id} />
           </h2>
         );
       },
       h3: ({ children }) => {
         const id = idFor(textOf(children));
         return (
-          <h3 id={id} className="mt-10 scroll-mt-28 text-h3 text-ink">
+          <h3 id={id} className="group mt-10 scroll-mt-28 text-h3 text-ink">
             {children}
+            <HeadingAnchor id={id} />
           </h3>
         );
       },

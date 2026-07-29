@@ -21,7 +21,7 @@ export default function Breadcrumbs({
   const blogRoot = `${SITE_URL}/blog`;
 
   return (
-    <nav aria-label="Breadcrumb" className="text-small text-stone">
+    <nav aria-label="Breadcrumb" className="text-small text-slate">
       <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
         {trail.map((crumb, i) => {
           const isLast = i === trail.length - 1;

@@ -51,7 +51,7 @@ export default function AuthorBox({ author }: { author: Author }) {
               {author.name}
             </Link>
           </p>
-          <p className="text-small text-stone">{author.role}</p>
+          <p className="text-small text-slate">{author.role}</p>
           {author.bio && <p className="mt-2 text-small text-slate">{author.bio}</p>}
 
           {author.links.length > 0 && (
@@ -76,7 +76,7 @@ export default function AuthorBox({ author }: { author: Author }) {
       {author.isGuest && (
         /* Disclosure, not decoration. A reader should be able to tell whose
          * opinion they just read without checking the byline's colour. */
-        <p className="mt-4 border-t-[1.5px] border-mist pt-4 text-small text-stone">
+        <p className="mt-4 border-t-[1.5px] border-mist pt-4 text-small text-slate">
           This is a guest post. It was reviewed and edited before publishing, but
           the views and any recommendations are the author&apos;s own.
         </p>

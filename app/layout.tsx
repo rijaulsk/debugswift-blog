@@ -134,13 +134,30 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
+        {/* Skip link.
+          *
+          * This deployment puts TWO navigation bars before the article — the
+          * shared site Header with its twelve-item services dropdown, plus
+          * TopicNav — so a keyboard or screen-reader user was tabbing through
+          * roughly twenty links on every single page before reaching a word of
+          * the post. Visually hidden until focused, then a normal-looking
+          * button in the top-left. */}
+        <a
+          href="#content"
+          className="sr-only z-50 rounded-full border-[1.5px] border-ink bg-cream px-5 py-3 font-medium text-ink focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+        >
+          Skip to content
+        </a>
         <Header />
         {/* Blog-local navigation, under the site header on every route. The
          * site Header is shared with the main deployment and has no room for
          * five topics; this strip is what makes categories reachable from a
          * post rather than only from the index. */}
         <TopicNav />
-        <div className="flex-1">{children}</div>
+        {/* tabIndex -1 so the skip link can move focus here, not just scroll. */}
+        <div id="content" tabIndex={-1} className="flex-1">
+          {children}
+        </div>
         <Footer />
         <StickyMobileBar />
         {/* Separate deployment = separate Analytics mount. The main site's
