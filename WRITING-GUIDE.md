@@ -3,13 +3,15 @@
 Everything needed to produce a post that sounds like every other post on this site,
 survives an originality check, and passes the validation rules in the Studio.
 
-Three things have to stay in agreement. If you change one, change all three:
+Five things have to stay in agreement. If you change one, change all five:
 
 | | |
 |---|---|
-| **This file** | the rules, and the prompt you paste into an AI assistant |
+| **This file** | the rules, the prompt you paste into an AI assistant, and the draft-file format (§7) |
 | `sanity/lib/postTemplate.ts` | the skeleton every new post opens with |
-| `sanity/lib/rules.ts` | the rules the Studio actually enforces |
+| `sanity/lib/rules.ts` | the vocabulary rules — banned words, tired phrases, the service link |
+| `sanity/lib/validatePost.ts` | every rule, in one implementation, called by the Studio, `check-content` and `push` |
+| `scripts/lib/draftFormat.ts` | the `drafts/<slug>.md` grammar |
 
 ---
 
@@ -180,10 +182,12 @@ Sanity, and `npm run seed` writes via the API, which does not validate — so
 
 ## 5. After the writing
 
-1. **Paste into the Studio**, replacing the template scaffolding. Structural blocks
-   (Steps, FAQ, Comparison table, Service link, Sourced statistic) exist because each
-   one produces machine-readable output — use them where they genuinely apply, not for
-   decoration.
+1. **Get it into Sanity**, one of two ways. Either paste into the Studio, replacing the
+   template scaffolding — or write `drafts/<slug>.md` and run `npm run push <slug>`,
+   which is §7. Both land in the same place; the second is the one an AI assistant uses,
+   and it validates before it writes. Structural blocks (Steps, FAQ, Comparison table,
+   Service link, Sourced statistic) exist because each one produces machine-readable
+   output — use them where they genuinely apply, not for decoration.
 2. **Cover image**: upload through the Cloudinary picker. Alt text describes what the
    image shows *in this post* — the same asset in another post usually needs a different
    sentence.
@@ -205,4 +209,86 @@ Sanity, and `npm run seed` writes via the API, which does not validate — so
   the sitemap.
 - Typo fix? Leave that date alone. Bumping it for a typo is freshness-gaming, and it is
   the kind of signal that gets a site discounted rather than promoted.
-- Regenerate the audio after any real change: `npm run audio <slug> --force`.
+- Regenerate the audio after any real change: `npm run audio <slug> -- --force`.
+  **The `--` is required.** npm treats `--force` as one of its own flags and swallows it
+  before the script sees it, so `npm run audio <slug> --force` silently does not force.
+- Editing a published post as a file? `npm run pull <slug>` first, always. It writes
+  `drafts/<slug>.md` from what is actually in Sanity. Pushing a stale draft file would
+  quietly revert whatever changed in the Studio since — which is why `push` refuses to
+  touch a published post without `--update`.
+
+---
+
+## 7. The draft file format — `drafts/<slug>.md`
+
+One shape a person, Claude Code and Antigravity can all produce for the same pipeline.
+
+```
+npm run pull <slug>                 # Sanity -> drafts/<slug>.md
+npm run push <slug> -- --dry-run    # validate, write nothing
+npm run push <slug>                 # write an UNPUBLISHED draft
+npm run push <slug> -- --update     # edit a post that is already live
+npm run push <slug> -- --force      # overwrite hand edits made in the Studio
+```
+
+**A draft file is a submission, not a mirror.** Once a post is published, the Studio is
+the source of truth. `push` never writes back into the file.
+
+### Frontmatter — scalars only
+
+One `key: value` per line; everything after the first colon is taken literally, so a
+title containing `: ` is fine. No lists, no nesting — anything structured is a fence.
+
+`title` · `slug` (must match the filename) · `excerpt` · `topic` (slug) · `author` (slug)
+· `publishedAt` · `updatedAt` · `cover` (Cloudinary public_id) · `coverAlt` · `seoTitle` ·
+`seoDescription` · `noindex`
+
+### Blocks — fences tagged `ds-`
+
+The rule is total: **every DebugSwift block is a fence tagged `ds-<name>`; every other
+fence is a code block whose language is its tag.** So ` ```ts ` is a code sample and
+there is no "unknown fence" error to worry about.
+
+| fence | what it becomes | payload |
+|---|---|---|
+| `ds-short-answer` | the Short answer field | prose, 40–60 words |
+| `ds-takeaways` | Key takeaways | one per line |
+| `ds-closing-faq` | the closing FAQ field | JSON `[{question, answer}]` |
+| `ds-sources` | Sources | JSON `[{label, url}]` |
+| `ds-note` | **nothing** — printed for the reviewer, never published | prose |
+| `ds-callout` | Callout | JSON `{tone: "note"\|"warning", title?, text}` |
+| `ds-faq` | an in-body FAQ | JSON `[{question, answer}]`, min 1 |
+| `ds-steps` | Steps (HowTo data) | JSON `{title?, steps: [{title, text?}]}`, min 2 |
+| `ds-table` | Comparison table | JSON `{caption?, columns: [2–4], rows: string[][]}` |
+| `ds-service` | Service link | JSON `{serviceSlug, blurb}` |
+| `ds-stat` | Sourced statistic | JSON `{value, label, sourceLabel, sourceUrl}` |
+| `ds-figure` | an image | JSON `{publicId, alt, caption?}` |
+
+Inline, exactly four forms: `**bold**`, `_em_`, `` `code` ``, `[label](url)`. They nest,
+so `**[a link](url)**` is one bold link rather than literal brackets on the page.
+
+### What `push` will not do
+
+- **It never writes the originality fields.** The parser rejects a file that even
+  mentions them. §3 is a human step, and a model asserting it ran a plagiarism check is
+  the invented-proof failure the honesty rules exist to stop. Put what you would suggest
+  checking in a `ds-originality-notes` fence instead — on a first push that text is
+  filed under Notes, behind a line saying no check has been run.
+- **It never invents a cover.** `cover:` must name a Cloudinary public_id that already
+  exists; the CLI verifies it and takes Cloudinary's own dimensions. No cover is fine —
+  omit the field and say what you would suggest in a `ds-note`. A wrong public_id is a
+  broken image on a live page.
+- **It never creates a topic or an author.** Unknown slug, hard stop, with the valid ones
+  listed.
+- **It never renames a slug, never sets `updatedAt`, and never publishes.**
+
+### When two people (or two agents) touch the same post
+
+Each push records a hash of the fields it owns. If the Studio copy has changed since,
+push names the fields and refuses, rather than overwriting your edit — `npm run pull` to
+take the newer version, or `--force` if the file really is the good copy. Two pushes at
+once are settled by Sanity's own revision check, not by a lock file, so it holds across
+two machines.
+
+Exit codes: `0` ok · `1` usage · `2` validation failed · `3` already published · `4`
+edited by hand · `5` concurrent write.

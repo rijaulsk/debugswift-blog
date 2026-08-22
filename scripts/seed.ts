@@ -1,6 +1,6 @@
 import { createClient } from "@sanity/client";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+
+import { loadDotEnvLocal } from "@/scripts/lib/env";
 
 /* Push the local content in content/ into Sanity.
  *
@@ -27,24 +27,6 @@ import { resolve } from "node:path";
  * alternative was a second copy of the demo post that could drift from the
  * first, which is a worse problem than a dev dependency.
  */
-
-/* Minimal .env.local reader — the app gets these from Next, but a standalone
- * script does not, and pulling in dotenv for six lines is not worth it. */
-function loadDotEnvLocal() {
-  try {
-    const raw = readFileSync(resolve(process.cwd(), ".env.local"), "utf8");
-    for (const line of raw.split("\n")) {
-      const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
-      if (!match) continue;
-      const [, key, value] = match;
-      if (!process.env[key!]) {
-        process.env[key!] = value!.replace(/^["']|["']$/g, "");
-      }
-    }
-  } catch {
-    /* No .env.local is fine if the variables are already exported. */
-  }
-}
 
 loadDotEnvLocal();
 

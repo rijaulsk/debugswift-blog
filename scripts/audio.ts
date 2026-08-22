@@ -1,7 +1,7 @@
 import { createClient } from "@sanity/client";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+
+import { loadDotEnvLocal } from "@/scripts/lib/env";
 
 /* Generate the spoken version of a post.
  *
@@ -24,20 +24,6 @@ import { resolve } from "node:path";
  */
 
 /* ---- env ---------------------------------------------------------------- */
-
-function loadDotEnvLocal() {
-  try {
-    const raw = readFileSync(resolve(process.cwd(), ".env.local"), "utf8");
-    for (const line of raw.split("\n")) {
-      const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
-      if (!match) continue;
-      const [, key, value] = match;
-      if (!process.env[key!]) process.env[key!] = value!.replace(/^["']|["']$/g, "");
-    }
-  } catch {
-    /* Fine if the variables are already exported. */
-  }
-}
 
 loadDotEnvLocal();
 

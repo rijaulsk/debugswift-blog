@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
     "audio": "tsx scripts/audio.ts",
-    "check-content": "tsx scripts/check-content.ts"
+    "check-content": "tsx scripts/check-content.ts",
+    "push": "tsx scripts/push.ts",
+    "pull": "tsx scripts/pull.ts"
   },
   "dependencies": {
     "@portabletext/react": "^7.0.1",

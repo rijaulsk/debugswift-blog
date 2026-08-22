@@ -1,4 +1,4 @@
-import { getClient, groqFetch } from "@/sanity/lib/client";
+import { getClient, getWriteClient, groqFetch } from "@/sanity/lib/client";
 import { resolveCover, type CloudinaryAsset } from "@/sanity/lib/cloudinary";
 import {
   allTopicsQuery,
@@ -231,6 +231,33 @@ export async function getPost(slug: string): Promise<Post | null> {
   if (!client) return localPosts.find((p) => p.slug === slug) ?? null;
 
   const raw = await groqFetch<RawPost | null>(client, postBySlugQuery, { slug });
+  return raw ? mapPost(raw) : null;
+}
+
+/**
+ * Reads the UNPUBLISHED draft of a post, if there is one.
+ *
+ * A SECOND DOOR, not a flag on getPost(). The rule at the top of this file is
+ * that no page can tell which source its data came from — it was never that
+ * there may only be one function. getPost() reads published content and always
+ * will, so nothing that renders the site changes shape or gains a branch.
+ *
+ * Written for `npm run pull`, which has to fetch drafts that have never been
+ * published. It needs a write token, so it returns null wherever there isn't
+ * one, and NOTHING THAT RENDERS A PAGE MAY CALL IT — a draft is unreviewed by
+ * definition, and on this repo that includes guest submissions.
+ *
+ * Uses the same mapPost as the published path, so the two cannot drift.
+ */
+export async function getDraftPost(slug: string): Promise<Post | null> {
+  const client = getWriteClient();
+  if (!client) return null;
+
+  const raw = await groqFetch<RawPost | null>(
+    client.withConfig({ perspective: "drafts" }),
+    postBySlugQuery,
+    { slug },
+  );
   return raw ? mapPost(raw) : null;
 }
 
