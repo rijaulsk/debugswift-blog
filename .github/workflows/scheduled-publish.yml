@@ -4,24 +4,34 @@ name: Publish scheduled posts
 #
 # WHY HERE AND NOT VERCEL. Vercel Cron on the Hobby plan runs once per day, UTC,
 # and only guarantees the hour — so "publish Tuesday at 09:00" is not something
-# it can do. Sanity's own scheduled publishing is a Growth-plan feature. This
-# runs every ten minutes on the free GitHub Actions allowance instead.
+# it can express. Sanity's own scheduled publishing is a Growth-plan feature.
+# This runs on the free GitHub Actions allowance instead.
 #
-# GitHub does not promise punctuality: a scheduled workflow can be delayed by
-# several minutes when the runners are busy, and it is skipped entirely if the
-# repository has had no activity for 60 days. Both are fine for a blog. Neither
+# ON THE INTERVAL, because it is a real constraint rather than a preference.
+# A private repo on the Free plan gets 2,000 Actions minutes a month, and every
+# run is billed as a whole minute rounded up. Every 15 minutes is 96 runs a day,
+# ~2,900 minutes a month — over budget on its own. So this job is kept as close
+# to nothing as possible: node_modules is restored from cache instead of
+# installed, which takes a run from ~50s to ~15s, and a run that finds nothing
+# due exits immediately. If the repository is PUBLIC, Actions minutes are
+# unlimited and none of this matters; if it is private and the budget bites,
+# lengthen the interval below rather than making the job cleverer.
+#
+# GitHub does not promise punctuality: a scheduled run can be delayed several
+# minutes when runners are busy, and scheduled workflows are disabled entirely
+# after 60 days without repository activity. Both are fine for a blog. Neither
 # would be fine for anything time-critical, so do not grow this into a
 # general-purpose job runner.
 #
 # The job has NO JUDGEMENT. Everything it publishes was approved and dated by a
-# person in the Studio, and the action there refuses to queue a post that would
-# fail validation. scripts/publish-due.ts re-checks anyway and leaves anything
-# that no longer validates in the queue, exiting non-zero so this run goes red
-# rather than a post sitting stuck in silence.
+# person in the Studio, and the Schedule action there refuses to queue a post
+# that would fail validation. scripts/publish-due.ts re-checks anyway and leaves
+# anything that no longer validates in the queue, exiting non-zero so this run
+# goes red rather than a post sitting stuck in silence.
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/15 * * * *"
   # So you can prove it works without waiting, and re-run a red one by hand.
   workflow_dispatch:
     inputs:
@@ -43,20 +53,53 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      # The secrets context cannot be used in an `if:` directly, so it is
+      # mapped to an output here. Without this the workflow would go red every
+      # quarter of an hour from the moment it is merged until the day somebody
+      # gets round to adding the secrets — and a job that is always red is a job
+      # nobody reads when it matters.
+      - name: Is the scheduler configured?
+        id: cfg
+        env:
+          TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
+          PROJECT: ${{ secrets.SANITY_PROJECT_ID }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$PROJECT" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Scheduler not configured::Add the repository secrets (SANITY_PROJECT_ID, SANITY_DATASET, SANITY_API_VERSION, SANITY_API_WRITE_TOKEN, BLOG_PUBLIC_ORIGIN, REVALIDATE_SECRET). Until then, posts scheduled in the Studio will NOT publish."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.cfg.outputs.configured == 'true'
 
       - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.configured == 'true'
         with:
           node-version: 24
-          cache: npm
 
-      - run: npm ci
+      # Restoring node_modules wholesale rather than running `npm ci` is the
+      # single biggest saving here — see the budget note at the top.
+      - name: Restore node_modules
+        if: steps.cfg.outputs.configured == 'true'
+        id: modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install (only when the lockfile changed)
+        if: steps.cfg.outputs.configured == 'true' && steps.modules.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Publish anything due
+        if: steps.cfg.outputs.configured == 'true'
         run: npm run publish-due ${{ inputs.dry_run && '-- --dry-run' || '' }}
         env:
-          # Repository secrets. The write token is the same Editor token used
-          # locally by seed/push — it must NOT be set on the Vercel project.
+          # The write token is the same Editor token used locally by seed and
+          # push. It must NOT be set on the Vercel project — nothing in the
+          # running site creates documents.
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
           NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.SANITY_API_VERSION }}
