@@ -317,6 +317,44 @@ export default defineType({
       description: "Pins the post to the top of the index.",
     }),
 
+    /* ---- Scheduling --------------------------------------------------------
+     *
+     * Set by the "Schedule for…" action beside Publish, and cleared the moment
+     * the post goes live or the schedule is cancelled. A draft carrying this
+     * field is queued; a draft without it is just a draft.
+     *
+     * Sanity's own scheduled publishing is a Growth-plan feature and the plugin
+     * that used to do it is deprecated, so this is ours: the field and the
+     * action live in the Studio, and a job outside presses Publish when the
+     * time comes. Nothing about the editing experience depends on that job —
+     * if it stops, posts sit queued rather than publishing wrongly.
+     *
+     * THE HONESTY RULE STILL HOLDS. The old wording was "nothing publishes
+     * without a human pressing Publish"; it is now "nothing publishes that a
+     * human has not approved and dated". Scheduling is still a deliberate human
+     * act — the action refuses to queue a post that would fail validation, so
+     * the cover and the originality check are done BEFORE it can be scheduled,
+     * not skipped by it.
+     * --------------------------------------------------------------------- */
+    defineField({
+      name: "scheduledFor",
+      title: "Scheduled for",
+      type: "datetime",
+      group: "meta",
+      readOnly: true,
+      description:
+        "Set with the Schedule action, not by hand. The post publishes automatically at this time.",
+    }),
+    defineField({
+      name: "scheduledBy",
+      title: "Scheduled by",
+      type: "string",
+      group: "meta",
+      readOnly: true,
+      hidden: true,
+      description: "Who queued it, recorded when the schedule was set.",
+    }),
+
     /* ---- Push provenance (hidden) ------------------------------------------
      *
      * Written only by `npm run push`. It is how the CLI tells "nobody has

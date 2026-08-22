@@ -10,6 +10,7 @@ import {
   DeclinePitchAction,
 } from "@/sanity/actions/approvePitch";
 import { CreatePostFromDraftAction } from "@/sanity/actions/createPostFromDraft";
+import { SchedulePostAction } from "@/sanity/actions/schedulePost";
 import { schemaTypes } from "@/sanity/schemaTypes";
 import { structure } from "@/sanity/structure";
 import { SANITY_API_VERSION, SANITY_DATASET, SANITY_PROJECT_ID } from "@/lib/env";
@@ -68,6 +69,12 @@ export default defineConfig({
         return prev.filter(
           ({ action }) => action && !["duplicate", "delete", "unpublish"].includes(action),
         );
+      }
+      if (context.schemaType === "post") {
+        /* Scheduling sits BESIDE Publish, not instead of it. The action is
+         * disabled until the document would actually publish, so a queued post
+         * has already cleared the cover and originality gates. */
+        return [...prev, SchedulePostAction];
       }
       return prev;
     },

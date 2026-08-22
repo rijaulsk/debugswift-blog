@@ -1,0 +1,68 @@
+name: Publish scheduled posts
+
+# Fires the posts a person queued in the Studio with "Schedule for…".
+#
+# WHY HERE AND NOT VERCEL. Vercel Cron on the Hobby plan runs once per day, UTC,
+# and only guarantees the hour — so "publish Tuesday at 09:00" is not something
+# it can do. Sanity's own scheduled publishing is a Growth-plan feature. This
+# runs every ten minutes on the free GitHub Actions allowance instead.
+#
+# GitHub does not promise punctuality: a scheduled workflow can be delayed by
+# several minutes when the runners are busy, and it is skipped entirely if the
+# repository has had no activity for 60 days. Both are fine for a blog. Neither
+# would be fine for anything time-critical, so do not grow this into a
+# general-purpose job runner.
+#
+# The job has NO JUDGEMENT. Everything it publishes was approved and dated by a
+# person in the Studio, and the action there refuses to queue a post that would
+# fail validation. scripts/publish-due.ts re-checks anyway and leaves anything
+# that no longer validates in the queue, exiting non-zero so this run goes red
+# rather than a post sitting stuck in silence.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  # So you can prove it works without waiting, and re-run a red one by hand.
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report what would publish, write nothing"
+        type: boolean
+        default: false
+
+# Two runs at once would race for the same queue. The second waits rather than
+# cancelling, because cancelling mid-transaction is how a half-published post
+# happens.
+concurrency:
+  group: scheduled-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Publish anything due
+        run: npm run publish-due ${{ inputs.dry_run && '-- --dry-run' || '' }}
+        env:
+          # Repository secrets. The write token is the same Editor token used
+          # locally by seed/push — it must NOT be set on the Vercel project.
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
+          NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.SANITY_API_VERSION }}
+          SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
+          # Where to send the revalidate ping: the blog's own Vercel origin,
+          # NOT debugswift.com/blog. A webhook has no reason to take the proxy
+          # hop, and the proxy is not what holds the cache.
+          BLOG_PUBLIC_ORIGIN: ${{ secrets.BLOG_PUBLIC_ORIGIN }}
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}

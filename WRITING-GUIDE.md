@@ -292,3 +292,29 @@ two machines.
 
 Exit codes: `0` ok · `1` usage · `2` validation failed · `3` already published · `4`
 edited by hand · `5` concurrent write.
+
+---
+
+## 8. Scheduling a post
+
+**"Schedule for…"** sits beside Publish in the Studio. Pick a date and time in your own
+timezone; the post goes live within about ten minutes of it, and its publish date is set
+to the time you chose. The document list shows what is queued, and the same button
+cancels a schedule.
+
+The button is **disabled until the post would actually publish**. That is deliberate: it
+means the cover and the originality check are done *before* anything is queued, so
+scheduling never becomes a way to skip them. Hover it to see which rule is in the way.
+
+If something changes after you queue it — a cover unset, a body edited into a banned word
+— the job **leaves the post in the queue and reports it** rather than publishing it
+broken or silently unscheduling it. Fix the problem and the next run picks it up.
+
+Two things worth knowing:
+
+- **Ten minutes, not to the second.** The job runs on a timer and can be delayed a few
+  minutes when the runners are busy. Fine for a blog; do not schedule anything to
+  coincide with something external.
+- **It will not run if the repository sits untouched for 60 days.** That is a GitHub
+  rule, not ours. If you stop committing for two months, check the queue before trusting
+  it.
