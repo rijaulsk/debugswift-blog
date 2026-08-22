@@ -25,7 +25,8 @@ file is only sequencing.
 
 In order. Nothing below matters until the blog is actually reachable.
 
-1. **GitHub repo + push.** Still no remote.
+1. ~~**GitHub repo + push.**~~ Done 23 Aug 2026 — `github.com/rijaulsk/debugswift-blog`,
+   branch `main`.
 2. **Vercel import** as its own project, never the website's. Env: the four Sanity vars,
    `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `REVALIDATE_SECRET`. **Not** the Cloudinary
    key/secret, **not** any `TTS_*` — those are `npm run audio`, local only.
@@ -40,8 +41,23 @@ In order. Nothing below matters until the blog is actually reachable.
    add `/blog` to `app/sitemap.ts`, re-add `https://debugswift.com/blog/sitemap.xml` to
    `app/robots.ts`, delete `app/blog/page.tsx`.
 
-The three seeded posts have **no cover and no originality record**, so none of them can
-publish from the Studio until a person does both.
+**What actually blocks the three posts, checked against the live dataset 23 Aug 2026:**
+
+| Post | Blocked by |
+|---|---|
+| `why-does-my-spreadsheet-keep-breaking` | originality record |
+| `why-do-i-keep-missing-enquiries-at-night` | originality record |
+| `is-this-agency-quote-too-high` | originality record, **and** "leverage" in the closing FAQ |
+
+The missing covers are only warnings now. The originality fields are a human step by
+design and `npm run push` is forbidden to write them.
+
+**The `leverage` question.** The sentence is *"…at a point where you have no leverage
+because switching would mean starting again."* That is the noun — bargaining power — used
+plainly, not the marketing verb the rule was written to ban. Two ways out: reword to "no
+room to negotiate", or add it to the stem exceptions in `sanity/lib/rules.ts` the way
+`transformer` and `elevator` already are. It is a copy decision, so it waits for the
+owner.
 
 ---
 
@@ -56,11 +72,18 @@ Unblocked by copying two static Satoshi weights from `E:\Fonts\OTF` into `public
 — Satori cannot read the woff2 the browser uses, and static instances are safer than the
 variable file.
 
-### 2. Stop covers being a gate
-`cover.present` is a warning, not an error — deliberately, because making it required
-would block the three seeded posts and there is no honest way for a script to invent a
-photograph. Add a **coded fallback header** so a post without a photograph still looks
-designed, and real photography becomes an upgrade rather than a blocker.
+### 2. ~~Coded in-page cover fallback~~ — dropped 23 Aug 2026, and it was a bad idea
+Written down on 22 Aug, reconsidered when it came to building it. A share card needs the
+title *in* it because a thumbnail has no other context. An in-page header does not: the
+title is already the first thing on the page, in real type, one line above. A decorative
+box repeating it would be redundant, and it would push the short answer further down —
+the exact thing `app/[slug]/page.tsx`'s own header comment says the reading order exists
+to protect.
+
+A post with no photograph should simply have no photograph. Nothing to build.
+
+`cover.present` stays a **warning**, so a missing cover no longer blocks publishing at
+all — the generated share card covers the only job the cover was really doing.
 
 ### 3. Generated photographs — at ~10 posts, not before
 **Cloudflare Workers AI + FLUX.1 Schnell** is the free option worth using: free daily
