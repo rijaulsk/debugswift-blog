@@ -6,19 +6,22 @@ import type { Author, FaqItem, Post, PostCard, Topic } from "@/lib/types";
 /**
  * The share card for a post.
  *
- * Cloudinary crops the cover to exactly 1200×630 with smart gravity, so every
- * share is the right aspect ratio without anyone thinking about it. Posts with
- * no cover fall back to the site card.
+ * Three tiers, best first:
  *
- * There is no generated title-card here, and that is a decision rather than an
- * omission. Composing one with next/og would mean rendering Satoshi through
- * Satori, and Satori cannot read woff2 — the only format this repo has the font
- * in (public/fonts/Satoshi-Variable.woff2). The options were an off-brand
- * fallback typeface on every share, or the author's own image. The image wins.
- * If a TTF or OTF of Satoshi ever lands in the repo, an ImageResponse route
- * becomes worth building for the covers-less case.
+ *  1. A Cloudinary cover, cropped to exactly 1200×630 with smart gravity. A
+ *     photograph a person chose beats anything laid out by a computer.
+ *  2. A generated card at /blog/og/<slug> carrying the post's own title. This is
+ *     what most posts get, because most posts will not have a photograph for a
+ *     while.
+ *  3. The site card, only when there is no post at all to describe.
+ *
+ * Tier 2 used to be impossible and the reason is worth keeping: Satori cannot
+ * read woff2, which was the only format public/fonts held, so the choice was an
+ * off-brand typeface on every share or the author's own image. Two static
+ * Satoshi weights (.otf) landed on 23 Aug 2026 purely for that route, and the
+ * generated card became the better default.
  */
-export function ogImageFor(post: Pick<Post, "cover">): {
+export function ogImageFor(post: Pick<Post, "cover" | "slug">): {
   url: string;
   width: number;
   height: number;
@@ -41,6 +44,14 @@ export function ogImageFor(post: Pick<Post, "cover">): {
       width: post.cover.width,
       height: post.cover.height,
       alt: post.cover.alt,
+    };
+  }
+  if (post.slug) {
+    return {
+      url: blogUrl(`/og/${post.slug}`),
+      width: 1200,
+      height: 630,
+      alt: "DebugSwift — Debugging businesses swiftly.",
     };
   }
   return {
