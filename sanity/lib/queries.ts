@@ -30,7 +30,18 @@ const topicProjection = groq`
   coverAlt
 `;
 
-/** Listing shape — no body, no FAQs, no sources. */
+/** Listing shape — no body, no FAQs, no sources.
+ *
+ * On `charCount`: character count, not word count. pt::text() flattens the body
+ * to a string and length() measures a string in characters. Cards don't fetch
+ * the body (that's the point of this projection), so reading time is estimated
+ * from this — see readingMinutesFromChars in lib/portableText.ts.
+ *
+ * KEEP EVERY COMMENT OUTSIDE THESE TEMPLATES. GROQ has no /* *\/ block comment,
+ * so anything written inside the backticks is sent to the API as part of the
+ * query and comes back as a parse error. This projection carried exactly that
+ * bug: it was invisible for as long as the repo had no Sanity project, because
+ * no query was ever executed, and it broke every page the moment one was. */
 export const postCardProjection = groq`
   "slug": slug.current,
   title,
@@ -42,10 +53,6 @@ export const postCardProjection = groq`
   "isGuest": author->isGuest,
   topic->{ ${topicProjection}, "pillar": null },
   author->{ ${authorProjection} },
-  /* Character count, not word count: pt::text() flattens the body to a string
-   * and length() measures a string in characters. Cards don't fetch the body
-   * (that's the point of this projection), so reading time is estimated from
-   * this — see readingMinutesFromChars in lib/portableText.ts. */
   "charCount": length(pt::text(body))
 `;
 
