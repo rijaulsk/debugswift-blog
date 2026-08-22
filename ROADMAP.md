@@ -47,20 +47,14 @@ publish from the Studio until a person does both.
 
 ## Next, in value order
 
-### 1. Coded share cards
-Every post currently shares the same generic `public/og.png`. A per-post card carrying
-the title is the highest-value visual fix on the list: it touches every link anyone
-posts, and a photograph without text is *worse* at thumbnail size than a typographic
-card.
+### 1. ~~Coded share cards~~ — done 23 Aug 2026
+`/blog/og/<slug>` draws a card with the post's own title, topic and reading time.
+Prerendered at build, one per post. `lib/seo.ts` picks: a Cloudinary cover wins, this is
+the fallback, the site card only when there is no post.
 
-Blocked on one thing only: **Satori cannot read woff2**, and `public/fonts/` has nothing
-else. Download Satoshi from Fontshare (already licensed and in use), drop the **OTF or
-TTF** into `public/fonts/`, and an `opengraph-image.tsx` per route becomes a couple of
-hours' work. Generate at build time, not per request.
-
-Design: cream `#F7F3EB`, the faint circuit motif, title in Satoshi, one clay `#E87D4A`
-accent, the mark bottom-left. `debugswift-assets/IMAGE-PROMPTS.md` §8 already argues that
-this class of asset should be coded rather than generated.
+Unblocked by copying two static Satoshi weights from `E:\Fonts\OTF` into `public/fonts/`
+— Satori cannot read the woff2 the browser uses, and static instances are safer than the
+variable file.
 
 ### 2. Stop covers being a gate
 `cover.present` is a warning, not an error — deliberately, because making it required
