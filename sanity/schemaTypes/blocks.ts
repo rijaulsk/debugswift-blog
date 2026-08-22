@@ -1,5 +1,7 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { SERVICE_SLUGS, SERVICE_TITLES } from "@/sanity/lib/services";
+
 /* Body block types.
  *
  * Every one of these exists to produce a specific machine-readable output, not
@@ -216,20 +218,7 @@ export const serviceLink = defineType({
       type: "string",
       validation: (r) => r.required(),
       options: {
-        list: [
-          { title: "AI Automation & Chatbots", value: "ai-automation" },
-          { title: "AI Integration", value: "ai-integration" },
-          { title: "Business Process Automation", value: "business-process-automation" },
-          { title: "Custom Web Apps & SaaS", value: "web-apps-saas" },
-          { title: "Web & App Development", value: "web-app-development" },
-          { title: "Conversion Websites", value: "conversion-websites" },
-          { title: "Landing Pages & Ad Campaigns", value: "landing-pages-ad-campaigns" },
-          { title: "SEO & Local Visibility", value: "seo-local-lead-gen" },
-          { title: "Brand & Design Systems", value: "brand-design-systems" },
-          { title: "E-commerce", value: "ecommerce" },
-          { title: "Technical Consulting", value: "technical-consulting" },
-          { title: "The Lead Engine (flagship)", value: "lead-engine" },
-        ],
+        list: SERVICE_SLUGS.map((value) => ({ title: SERVICE_TITLES[value], value })),
       },
     }),
     defineField({

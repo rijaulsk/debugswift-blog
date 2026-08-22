@@ -1,13 +1,11 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
-import { postBodyTemplate, TEMPLATE_MARKER } from "@/sanity/lib/postTemplate";
+import { postBodyTemplate } from "@/sanity/lib/postTemplate";
 import {
-  bodyHasNoBannedWords,
-  bodyHasNoTiredPhrases,
-  bodyLengthWarning,
-  bodyLinksAService,
-  noBannedWords,
-  noTiredPhrases,
-} from "@/sanity/lib/rules";
+  fromSanityDoc,
+  validatePost,
+  type CheckId,
+  type CheckResult,
+} from "@/sanity/lib/validatePost";
 
 /* A post.
  *
@@ -15,7 +13,51 @@ import {
  * the whole design: the fields below are the ones that decide whether a post
  * can win a featured snippet, be quoted by an answer engine, or be cited by a
  * model — and optional SEO fields are fields nobody fills in. shortAnswer and
- * excerpt are required for that reason, not to be strict for its own sake. */
+ * excerpt are required for that reason, not to be strict for its own sake.
+ *
+ * WHERE THE RULES LIVE. Structural constraints — required(), max(), min() —
+ * stay on their fields, because Sanity does those natively and they drive the
+ * asterisks, the live character counters and the disabled Publish button.
+ * Everything that used to be a custom() has moved to the document-level rule at
+ * the bottom of this file, which calls sanity/lib/validatePost.ts.
+ *
+ * The reason is not tidiness. Schema validation DOES NOT RUN ON API WRITES, so
+ * `npm run seed` and `npm run push` never saw any of these rules. They now call
+ * the same validatePost() this file does, which makes the Studio and the CLI
+ * genuinely one gate instead of two that drift. */
+
+/* Checks Sanity's own required()/max() already reports on the field itself.
+ * Running them again at document level would show every message twice. */
+const HANDLED_BY_FIELD_RULES: CheckId[] = [
+  "title.length",
+  "excerpt.length",
+  "keyTakeaways.max",
+  "topic.set",
+  "author.set",
+  "publishedAt.set",
+  "originality.recorded",
+];
+
+/* Which field a message should attach itself to, where it is not simply the
+ * check's own field group. */
+const EXPLICIT_PATHS: Partial<Record<CheckId, string>> = {
+  "cover.present": "cover",
+  "cover.alt": "coverAlt",
+  "originality.notFuture": "originalityCheckedAt",
+};
+
+const toValidationErrors = (results: CheckResult[], severity: "error" | "warning") =>
+  results
+    .filter((c) => !c.skipped && c.severity === severity && c.result !== true)
+    .map((c) => ({
+      message: String(c.result),
+      path: [EXPLICIT_PATHS[c.id] ?? c.field],
+    }));
+
+const runChecks = (doc: unknown): CheckResult[] =>
+  validatePost(fromSanityDoc((doc ?? {}) as Record<string, unknown>), {
+    skip: HANDLED_BY_FIELD_RULES,
+  });
 export default defineType({
   name: "post",
   title: "Post",
@@ -34,10 +76,7 @@ export default defineType({
       group: "content",
       description:
         "One question, phrased the way an owner would actually ask it — \"Why does my spreadsheet keep breaking?\", not \"5 Productivity Hacks\". See WRITING-GUIDE.md.",
-      validation: (r) => [
-        r.required().max(90).custom(noBannedWords),
-        r.warning().custom(noTiredPhrases),
-      ],
+      validation: (r) => r.required().max(90),
     }),
     defineField({
       name: "slug",
@@ -53,10 +92,7 @@ export default defineType({
       group: "content",
       description:
         "Card copy and meta description. Under 160 characters or search engines truncate it mid-sentence.",
-      validation: (r) => [
-        r.required().max(160).custom(noBannedWords),
-        r.warning().custom(noTiredPhrases),
-      ],
+      validation: (r) => r.required().max(160),
     }),
     defineField({
       name: "shortAnswer",
@@ -66,19 +102,7 @@ export default defineType({
       group: "answer",
       description:
         "40–60 words answering the title directly, in plain language, standing entirely on its own. This is the block a featured snippet lifts and the paragraph a model quotes — it must make sense to someone who has read nothing else on the page.",
-      validation: (r) => [
-        r
-          .required()
-          .custom(noBannedWords)
-          .custom((value) => {
-            if (typeof value !== "string") return true;
-            const words = value.trim().split(/\s+/).filter(Boolean).length;
-            if (words < 30) return "Too short to answer the question — aim for 40–60 words.";
-            if (words > 80) return "Too long to be lifted as an answer — aim for 40–60 words.";
-            return true;
-          }),
-        r.warning().custom(noTiredPhrases),
-      ],
+      validation: (r) => r.required(),
     }),
     defineField({
       name: "keyTakeaways",
@@ -98,19 +122,7 @@ export default defineType({
        * See sanity/lib/postTemplate.ts — and note the marker check below, which
        * is what stops the scaffolding being published as if it were writing. */
       initialValue: postBodyTemplate,
-      validation: (r) => [
-        r
-          .required()
-          .custom(bodyHasNoBannedWords)
-          .custom(bodyLinksAService)
-          .custom((value) => {
-            const hasMarker = JSON.stringify(value ?? "").includes(TEMPLATE_MARKER);
-            return hasMarker
-              ? "The template instructions are still in the body. Replace them with the actual post."
-              : true;
-          }),
-        r.warning().custom(bodyHasNoTiredPhrases).custom(bodyLengthWarning),
-      ],
+      validation: (r) => r.required(),
     }),
     defineField({
       name: "faqs",
@@ -160,14 +172,7 @@ export default defineType({
       type: "string",
       group: "content",
       description: "What the cover shows, for someone who cannot see it.",
-      validation: (r) =>
-        r.max(180).custom((value, ctx) => {
-          const doc = ctx.document as { cover?: { public_id?: string } } | undefined;
-          if (doc?.cover?.public_id && !value?.trim()) {
-            return "A cover image needs alt text.";
-          }
-          return true;
-        }),
+      validation: (r) => r.max(180),
     }),
     defineField({
       name: "topic",
@@ -209,14 +214,9 @@ export default defineType({
       title: "Checked on",
       type: "date",
       group: "checks",
-      validation: (r) =>
-        r.required().custom((value) => {
-          if (!value) return true;
-          /* A check dated in the future is a check nobody ran. */
-          return Date.parse(String(value)) > Date.now() + 86_400_000
-            ? "That date is in the future."
-            : true;
-        }),
+      /* A check dated in the future is a check nobody ran — enforced by the
+       * document rule at the bottom of this file. */
+      validation: (r) => r.required(),
     }),
     defineField({
       name: "originalityNotes",
@@ -315,6 +315,56 @@ export default defineType({
       group: "meta",
       initialValue: false,
       description: "Pins the post to the top of the index.",
+    }),
+
+    /* ---- Push provenance (hidden) ------------------------------------------
+     *
+     * Written only by `npm run push`. It is how the CLI tells "nobody has
+     * touched this since I wrote it" from "a human has edited it in the
+     * Studio": the hash covers the fields push owns, so a mismatch means
+     * somebody changed one by hand and push refuses rather than overwriting.
+     *
+     * It lives on the document rather than in a repo file on purpose — a
+     * drafts/.state.json would go stale across checkouts and machines, and this
+     * is a fact ABOUT the document.
+     *
+     * `tool` is internal provenance for the owner. It is NOT reader-facing
+     * disclosure, and it must never be added to postProjection in
+     * sanity/lib/queries.ts — nothing here reaches the site.
+     * --------------------------------------------------------------------- */
+    defineField({
+      name: "agentPush",
+      title: "Push provenance",
+      type: "object",
+      group: "meta",
+      hidden: true,
+      fields: [
+        defineField({ name: "hash", type: "string" }),
+        /* A hash per owned field, as JSON, so a mismatch can name the field
+         * somebody changed instead of shrugging at the whole document. A JSON
+         * string rather than an object because the key set is dynamic. */
+        defineField({ name: "fields", type: "text", rows: 2 }),
+        defineField({ name: "at", type: "datetime" }),
+        defineField({ name: "source", type: "string" }),
+        defineField({ name: "tool", type: "string" }),
+      ],
+    }),
+  ],
+  /* One document-level rule instead of a dozen field-level custom() calls.
+   *
+   * Document level because several checks need more than their own field —
+   * cover alt text depends on whether a cover exists, and the body checks read
+   * block shapes. Returning ValidationError[] with a path attaches each message
+   * to the field that has to change, so the editing experience is the same as
+   * before while the implementation is shared with the CLI. */
+  validation: (r) => [
+    r.custom((doc) => {
+      const errors = toValidationErrors(runChecks(doc), "error");
+      return errors.length ? errors : true;
+    }),
+    r.warning().custom((doc) => {
+      const warnings = toValidationErrors(runChecks(doc), "warning");
+      return warnings.length ? warnings : true;
     }),
   ],
   orderings: [

@@ -1,5 +1,7 @@
 import { defineField, defineType } from "sanity";
 
+import { SERVICE_TITLES, TOPIC_SERVICE_SLUGS } from "@/sanity/lib/services";
+
 /* A topic is a PILLAR PAGE, not a tag.
  *
  * The difference is the `pillar` field. A tag page is a filtered list — thin,
@@ -49,19 +51,13 @@ export default defineType({
       description:
         "The main-site service this topic maps to. Drives the hub's link across to /services — the other half of the internal link triangle.",
       options: {
-        list: [
-          { title: "AI Automation & Chatbots", value: "ai-automation" },
-          { title: "AI Integration", value: "ai-integration" },
-          { title: "Business Process Automation", value: "business-process-automation" },
-          { title: "Custom Web Apps & SaaS", value: "web-apps-saas" },
-          { title: "Web & App Development", value: "web-app-development" },
-          { title: "Conversion Websites", value: "conversion-websites" },
-          { title: "Landing Pages & Ad Campaigns", value: "landing-pages-ad-campaigns" },
-          { title: "SEO & Local Visibility", value: "seo-local-lead-gen" },
-          { title: "Brand & Design Systems", value: "brand-design-systems" },
-          { title: "E-commerce", value: "ecommerce" },
-          { title: "Technical Consulting", value: "technical-consulting" },
-        ],
+        /* Derived from the one list, minus the Lead Engine: that is a product
+         * page, not a service, so a topic hub never maps to it. A serviceLink
+         * block inside a post still can. */
+        list: TOPIC_SERVICE_SLUGS.map((value) => ({
+          title: SERVICE_TITLES[value],
+          value,
+        })),
       },
     }),
     defineField({ name: "cover", title: "Cover image", type: "cloudinary.asset" }),
