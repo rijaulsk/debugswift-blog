@@ -84,8 +84,15 @@ export default function PostBody({ value, isGuest = false }: Props) {
       ),
       h2: ({ children }) => {
         const id = idFor(textOf(children));
+        /* text-balance stops a heading leaving one orphan word on its own line,
+         * and break-words is the backstop for a long unbroken token — a product
+         * name or a URL — that would otherwise run past the column edge on a
+         * phone. */
         return (
-          <h2 id={id} className="group mt-14 scroll-mt-28 text-h2 text-ink">
+          <h2
+            id={id}
+            className="group mt-14 scroll-mt-28 text-balance break-words text-h2-mobile text-ink md:text-h2"
+          >
             {children}
             <HeadingAnchor id={id} />
           </h2>
@@ -94,7 +101,10 @@ export default function PostBody({ value, isGuest = false }: Props) {
       h3: ({ children }) => {
         const id = idFor(textOf(children));
         return (
-          <h3 id={id} className="group mt-10 scroll-mt-28 text-h3 text-ink">
+          <h3
+            id={id}
+            className="group mt-10 scroll-mt-28 text-balance break-words text-h3 text-ink"
+          >
             {children}
             <HeadingAnchor id={id} />
           </h3>

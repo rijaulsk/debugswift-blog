@@ -79,7 +79,7 @@ export function SectionHeader({
         {eyebrow}
       </Eyebrow>
       <Heading
-        className={`mt-3 max-w-4xl text-h2${centerBlock} ${dark ? "text-cream" : "text-ink"}`}
+        className={`mt-3 max-w-4xl text-balance break-words text-h2-mobile md:text-h2${centerBlock} ${dark ? "text-cream" : "text-ink"}`}
       >
         {title}
       </Heading>

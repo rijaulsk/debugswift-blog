@@ -56,7 +56,11 @@ export default function PostCard({
           </Link>
         )}
 
-        <h3 className={`mt-3 text-ink ${featured ? "text-h2" : "text-h3"}`}>
+        <h3
+          className={`mt-3 text-balance break-words text-ink ${
+            featured ? "text-h2-mobile md:text-h2" : "text-h3"
+          }`}
+        >
           {/* The ::after spans the card, so the whole tile is clickable while the
            * link's accessible name stays just the title. */}
           <Link

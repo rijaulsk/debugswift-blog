@@ -319,7 +319,7 @@ export default async function PostPage({ params }: Props) {
       <section className="border-t-[1.5px] border-mist bg-sand">
         <div className="mx-auto w-full max-w-canvas px-6 py-14 md:px-12 md:py-20">
           <Eyebrow>Keep reading</Eyebrow>
-          <h2 className="mt-3 text-h2 text-ink">
+          <h2 className="mt-3 text-balance break-words text-h2-mobile text-ink md:text-h2">
             {related.length > 0
               ? post.topic
                 ? `More on ${post.topic.title.toLowerCase()}`

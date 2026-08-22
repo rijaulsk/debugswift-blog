@@ -36,7 +36,7 @@ function Invalid({ reason }: { reason: string }) {
     <main className="mx-auto w-full max-w-canvas px-6 py-24 md:px-12">
       <div className="max-w-xl">
         <Eyebrow>Invite link</Eyebrow>
-        <h1 className="mt-4 text-h2 text-ink">{reason}</h1>
+        <h1 className="mt-4 text-balance text-h2-mobile text-ink md:text-h2">{reason}</h1>
         <p className="mt-5 text-slate">
           Reply to the email that sent you this link and we&apos;ll issue a fresh
           one, or write to{" "}

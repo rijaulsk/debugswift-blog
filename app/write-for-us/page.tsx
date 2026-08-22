@@ -94,7 +94,7 @@ export default function WriteForUsPage() {
 
       <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="max-w-2xl">
-          <h2 className="text-h2 text-ink">Pitch a post</h2>
+          <h2 className="text-balance text-h2-mobile text-ink md:text-h2">Pitch a post</h2>
           <div className="mt-8">
             <PitchForm />
           </div>

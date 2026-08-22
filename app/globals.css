@@ -82,6 +82,20 @@
   --text-h2: 2.25rem; /* 36px */
   --text-h2--line-height: 2.625rem; /* 42px */
   --text-h2--font-weight: 700;
+  /* The step the scale was missing (added 23 Aug 2026).
+   *
+   * H1 drops 52 -> 36 on mobile and H2 did not drop at all, so on a phone a
+   * section heading was rendered at exactly the same size as the page title:
+   * 36px against 36px. The hierarchy collapsed, and a heading of any length ran
+   * to four lines inside a 342px column. Every H1 in the repo already pairs
+   * text-h1-mobile with md:text-h1; H2 now does the same.
+   *
+   * 28px keeps the ladder honest at 390px — 36 title / 28 section / 24 sub /
+   * 18 body — and holds a heading like "Why it breaks when you are busiest" to
+   * two lines instead of four. */
+  --text-h2-mobile: 1.75rem; /* 28px */
+  --text-h2-mobile--line-height: 2.125rem; /* 34px */
+  --text-h2-mobile--font-weight: 700;
   --text-h3: 1.5rem; /* 24px */
   --text-h3--line-height: 2rem; /* 32px */
   --text-h3--font-weight: 500;

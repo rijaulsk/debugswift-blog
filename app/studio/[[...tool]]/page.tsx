@@ -40,7 +40,7 @@ export default function StudioPage() {
     return (
       <main className="mx-auto w-full max-w-canvas px-6 py-24 md:px-12">
         <p className="text-eyebrow uppercase text-indigo-600">Studio</p>
-        <h1 className="mt-3 max-w-2xl text-h2 text-ink">
+        <h1 className="mt-3 max-w-2xl text-balance text-h2-mobile text-ink md:text-h2">
           No Sanity project connected yet.
         </h1>
         <p className="mt-5 max-w-2xl text-slate">
