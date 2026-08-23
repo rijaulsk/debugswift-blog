@@ -21,15 +21,47 @@ file is only sequencing.
 
 ---
 
+## The one that bit us — read this before trusting a deploy
+
+**23 Aug 2026: the blog went live serving the `content/` fixtures, not Sanity**, and
+stayed that way unnoticed. `NEXT_PUBLIC_SANITY_PROJECT_ID` was never set on the Vercel
+project, so `lib/content.ts` took the local-content path in production.
+
+It is invisible from the outside. Every URL returns 200, the sitemap resolves, the feeds
+work, the posts are all there — because the fixtures are copies of the same three posts.
+Publishing in the Studio changed nothing on the site and produced no error anywhere.
+
+**Never verify "the blog is live" with HTTP 200s.** The three checks that actually
+distinguish it:
+
+| Check | Fixtures | Sanity |
+|---|---|---|
+| `/blog/studio` | "No Sanity project connected yet" | the Studio loads |
+| Card image URLs in the markup | `/photos/…` | `res.cloudinary.com/…` |
+| Cover present at all | yes (fixtures ship covers) | only once one is attached |
+
+`lib/env.ts` now throws at build time when `VERCEL` is set and the project ID is not, so
+this cannot recur silently. A failed build is the intended outcome; Vercel keeps serving
+the last good deployment while it is fixed.
+
+Related trap: `NEXT_PUBLIC_*` values are inlined at BUILD time. Setting them in Vercel
+does nothing to an existing deployment — it needs a redeploy. And they are scoped per
+environment, so Production must be ticked, not just Preview.
+
 ## Blocked on going live
 
 In order. Nothing below matters until the blog is actually reachable.
 
 1. ~~**GitHub repo + push.**~~ Done 23 Aug 2026 — `github.com/rijaulsk/debugswift-blog`,
    branch `main`.
-2. **Vercel import** as its own project, never the website's. Env: the four Sanity vars,
-   `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `REVALIDATE_SECRET`. **Not** the Cloudinary
-   key/secret, **not** any `TTS_*` — those are `npm run audio`, local only.
+2. **Vercel env vars — STILL OUTSTANDING as of 23 Aug 2026.** `REVALIDATE_SECRET` is set
+   and verified (`{"revalidated":true}`). These five are not, and until they are the site
+   serves fixtures — see the section above:
+   `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`,
+   `NEXT_PUBLIC_SANITY_API_VERSION`, `SANITY_API_WRITE_TOKEN`,
+   `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`.
+   **Not** the Cloudinary key/secret, **not** any `TTS_*`, **not** the Cloudflare pair —
+   those are local-only CLI credentials.
 3. **Sanity webhook** → `https://<blog>.vercel.app/blog/api/revalidate`, header
    `x-revalidate-secret`, filter `_type == "post"`. The Vercel origin directly, not
    through the proxy.
