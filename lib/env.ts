@@ -41,16 +41,23 @@ export const IS_SANITY_CONFIGURED = SANITY_PROJECT_ID.length > 0;
  * so every page served the demo fixtures instead of the CMS. Nothing looked
  * wrong. The posts were there, the sitemap resolved, the feeds worked, every
  * URL returned 200 — because the fixtures are copies of the same three posts.
- * Publishing in the Studio changed nothing on the site and there was no symptom
- * to notice, only a Studio page quietly saying no project was connected.
  *
- * So: on Vercel, an unconfigured Sanity project is a BUILD FAILURE. That is the
- * same rule lib/content.ts already applies to an empty dataset, extended to the
- * case that actually happened. Better a deploy that stops with a sentence
- * telling you which variable is missing than one that succeeds and serves the
- * wrong content for a fortnight.
+ * THIS WAS A HARD BUILD FAILURE FOR A DAY, AND IS NOW A LOUD WARNING. The
+ * downgrade is deliberate, not a retreat from the rule.
  *
- * Local development is untouched — no VERCEL, no throw, fixtures as before. */
+ * Failing the build was the right call when the problem was INVISIBLE: there
+ * was no way to look at a running deployment and tell which content it was
+ * serving, so stopping the deploy was the only signal available. That is no
+ * longer true. next.config.ts now sets `x-blog-cms: sanity | local-fixtures` on
+ * every response, so one curl answers it, and /blog/studio says so in words.
+ *
+ * With the condition observable from outside, a hard failure buys nothing and
+ * costs a great deal: a guard that blocks every deploy while somebody works out
+ * which dashboard field is wrong is a guard that gets deleted in frustration,
+ * and it takes the diagnosis with it. Warn loudly, ship, and let the header say
+ * what happened.
+ *
+ * Local development is untouched — no VERCEL, no warning, fixtures as before. */
 if (process.env.VERCEL && !IS_SANITY_CONFIGURED && !process.env.BLOG_ALLOW_FIXTURES) {
   /* Print what this build can actually SEE before failing.
    *
@@ -96,25 +103,31 @@ if (process.env.VERCEL && !IS_SANITY_CONFIGURED && !process.env.BLOG_ALLOW_FIXTU
     );
   }
 
+  report.unshift(
+    "",
+    "  ============================================================",
+    "  THIS DEPLOYMENT HAS NO SANITY PROJECT.",
+    "",
+    "  It will build and it will serve pages, but every one of them",
+    "  comes from the demo fixtures in content/, not from the CMS.",
+    "  Nothing published in the Studio will appear on the site.",
+    "  ============================================================",
+  );
+
   report.push(
     "",
     "  If the names are right, check the ENVIRONMENT column in Vercel: a variable",
     "  ticked only for Preview is missing from a Production build. Values are read",
     "  when the build runs, so changing one needs a redeploy, not a restart.",
     "",
-    "  To ship anyway, knowing the site will serve the demo fixtures in content/",
-    "  rather than the CMS, set BLOG_ALLOW_FIXTURES=1. Nothing else overrides this.",
+    "  Confirm which source a deployment is using without guessing:",
+    "    curl -sI https://debugswift.com/blog | grep x-blog",
+    "  x-blog-cms reports sanity or local-fixtures, and x-blog-commit says which",
+    "  build answered.",
     "",
   );
 
   console.error(report.join("\n"));
-
-  throw new Error(
-    "NEXT_PUBLIC_SANITY_PROJECT_ID is not set on this deployment.\n\n" +
-      "Without it the blog silently serves the demo content in content/ instead of the\n" +
-      "CMS: every page renders, every URL returns 200, and nothing published in the\n" +
-      "Studio ever appears. See the environment report printed above.",
-  );
 }
 
 /** True once Cloudinary exists. Until then, covers come from /public. */
