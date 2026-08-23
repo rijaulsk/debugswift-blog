@@ -51,14 +51,69 @@ export const IS_SANITY_CONFIGURED = SANITY_PROJECT_ID.length > 0;
  * wrong content for a fortnight.
  *
  * Local development is untouched — no VERCEL, no throw, fixtures as before. */
-if (process.env.VERCEL && !IS_SANITY_CONFIGURED) {
+if (process.env.VERCEL && !IS_SANITY_CONFIGURED && !process.env.BLOG_ALLOW_FIXTURES) {
+  /* Print what this build can actually SEE before failing.
+   *
+   * The first version of this guard threw one sentence naming the variable, and
+   * that was not enough: the variable was in the dashboard, the deploys failed
+   * anyway, and there was no way to tell a missing value from a misspelled name
+   * from the wrong environment. Names only, never values — a build log is not a
+   * secret store. */
+  const present = (name: string) => (process.env[name]?.trim() ? "set" : "MISSING");
+
+  const report = [
+    "",
+    "  Environment this build can see:",
+    `    VERCEL_ENV                          ${process.env.VERCEL_ENV ?? "(none)"}`,
+    `    NEXT_PUBLIC_SANITY_PROJECT_ID       ${present("NEXT_PUBLIC_SANITY_PROJECT_ID")}`,
+    `    NEXT_PUBLIC_SANITY_DATASET          ${present("NEXT_PUBLIC_SANITY_DATASET")}`,
+    `    NEXT_PUBLIC_SANITY_API_VERSION      ${present("NEXT_PUBLIC_SANITY_API_VERSION")}`,
+    `    SANITY_API_WRITE_TOKEN              ${present("SANITY_API_WRITE_TOKEN")}`,
+    `    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME   ${present("NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME")}`,
+    `    REVALIDATE_SECRET                   ${present("REVALIDATE_SECRET")}`,
+  ];
+
+  /* The mistake most likely to have been made here, because this repo's own
+   * GitHub Actions workflow calls its SECRET "SANITY_PROJECT_ID" and maps it to
+   * the prefixed name. Copying that naming into Vercel produces exactly this:
+   * a variable that is present, correct, and invisible to the app. */
+  const unprefixed = [
+    ["SANITY_PROJECT_ID", "NEXT_PUBLIC_SANITY_PROJECT_ID"],
+    ["SANITY_DATASET", "NEXT_PUBLIC_SANITY_DATASET"],
+    ["SANITY_API_VERSION", "NEXT_PUBLIC_SANITY_API_VERSION"],
+    ["CLOUDINARY_CLOUD_NAME", "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME"],
+  ].filter(([wrong, right]) => process.env[wrong]?.trim() && !process.env[right]?.trim());
+
+  if (unprefixed.length) {
+    report.push(
+      "",
+      "  FOUND THE PROBLEM — these are set under the wrong name:",
+      ...unprefixed.map(([wrong, right]) => `    ${wrong}  ->  rename to  ${right}`),
+      "",
+      "  The NEXT_PUBLIC_ prefix is not decoration. Next inlines those values into",
+      "  the browser bundle at build time, and the Studio runs in the browser, so a",
+      "  variable without the prefix is invisible to it however correct the value is.",
+    );
+  }
+
+  report.push(
+    "",
+    "  If the names are right, check the ENVIRONMENT column in Vercel: a variable",
+    "  ticked only for Preview is missing from a Production build. Values are read",
+    "  when the build runs, so changing one needs a redeploy, not a restart.",
+    "",
+    "  To ship anyway, knowing the site will serve the demo fixtures in content/",
+    "  rather than the CMS, set BLOG_ALLOW_FIXTURES=1. Nothing else overrides this.",
+    "",
+  );
+
+  console.error(report.join("\n"));
+
   throw new Error(
     "NEXT_PUBLIC_SANITY_PROJECT_ID is not set on this deployment.\n\n" +
       "Without it the blog silently serves the demo content in content/ instead of the\n" +
       "CMS: every page renders, every URL returns 200, and nothing published in the\n" +
-      "Studio ever appears. Set it (and NEXT_PUBLIC_SANITY_DATASET,\n" +
-      "NEXT_PUBLIC_SANITY_API_VERSION, SANITY_API_WRITE_TOKEN and\n" +
-      "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) in the Vercel project settings and redeploy.",
+      "Studio ever appears. See the environment report printed above.",
   );
 }
 

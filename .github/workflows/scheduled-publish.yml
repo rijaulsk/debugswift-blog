@@ -58,15 +58,21 @@ jobs:
       # quarter of an hour from the moment it is merged until the day somebody
       # gets round to adding the secrets — and a job that is always red is a job
       # nobody reads when it matters.
+      # The secret names match the APP's variable names exactly, prefix and all.
+      # They did not at first — the secrets were SANITY_PROJECT_ID and friends,
+      # mapped onto the prefixed names below — and that is a trap worth removing:
+      # anyone setting Vercel up from this file would copy the unprefixed names,
+      # and a Sanity variable without NEXT_PUBLIC_ is invisible to the app while
+      # looking perfectly correct in a dashboard.
       - name: Is the scheduler configured?
         id: cfg
         env:
           TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
-          PROJECT: ${{ secrets.SANITY_PROJECT_ID }}
+          PROJECT: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
         run: |
           if [ -z "$TOKEN" ] || [ -z "$PROJECT" ]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=Scheduler not configured::Add the repository secrets (SANITY_PROJECT_ID, SANITY_DATASET, SANITY_API_VERSION, SANITY_API_WRITE_TOKEN, BLOG_PUBLIC_ORIGIN, REVALIDATE_SECRET). Until then, posts scheduled in the Studio will NOT publish."
+            echo "::notice title=Scheduler not configured::Add the repository secrets (NEXT_PUBLIC_SANITY_PROJECT_ID, NEXT_PUBLIC_SANITY_DATASET, NEXT_PUBLIC_SANITY_API_VERSION, SANITY_API_WRITE_TOKEN, BLOG_PUBLIC_ORIGIN, REVALIDATE_SECRET). Until then, posts scheduled in the Studio will NOT publish."
           else
             echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
@@ -100,9 +106,9 @@ jobs:
           # The write token is the same Editor token used locally by seed and
           # push. It must NOT be set on the Vercel project — nothing in the
           # running site creates documents.
-          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
-          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
-          NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.SANITY_API_VERSION }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.NEXT_PUBLIC_SANITY_API_VERSION }}
           SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
           # Where to send the revalidate ping: the blog's own Vercel origin,
           # NOT debugswift.com/blog. A webhook has no reason to take the proxy
