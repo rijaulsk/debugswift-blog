@@ -12,36 +12,18 @@ import type { PostCard as PostCardType } from "@/lib/types";
  * enormous link whose accessible name is the entire card, and it makes the
  * topic pill (a second, different destination) impossible to nest legally.
  * The ::after trick below keeps the large click target without that cost. */
-export default function PostCard({
-  post,
-  featured = false,
-}: {
-  post: PostCardType;
-  featured?: boolean;
-}) {
+export default function PostCard({ post }: { post: PostCardType }) {
   return (
-    <article
-      className={`group relative flex flex-col overflow-hidden rounded-card border-[1.5px] border-ink bg-paper transition-colors duration-200 ease-out hover:bg-cream ${
-        featured ? "md:flex-row" : ""
-      }`}
-    >
+    <article className="group relative flex flex-col overflow-hidden rounded-card border-[1.5px] border-ink bg-paper transition-colors duration-200 ease-out hover:bg-cream">
       {post.cover && (
-        <div className={featured ? "md:w-1/2 md:shrink-0" : ""}>
-          <Image
-            src={publicAsset(post.cover.src)}
-            alt={post.cover.alt}
-            width={post.cover.width}
-            height={post.cover.height}
-            sizes={
-              featured
-                ? "(max-width: 768px) 100vw, 640px"
-                : "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 400px"
-            }
-            className={`w-full border-b-[1.5px] border-ink object-cover ${
-              featured ? "h-56 md:h-full md:border-b-0 md:border-r-[1.5px]" : "h-48"
-            }`}
-          />
-        </div>
+        <Image
+          src={publicAsset(post.cover.src)}
+          alt={post.cover.alt}
+          width={post.cover.width}
+          height={post.cover.height}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+          className="h-48 w-full border-b-[1.5px] border-ink object-cover"
+        />
       )}
 
       <div className="flex flex-1 flex-col p-6">
@@ -56,11 +38,7 @@ export default function PostCard({
           </Link>
         )}
 
-        <h3
-          className={`mt-3 text-balance break-words text-ink ${
-            featured ? "text-h2-mobile md:text-h2" : "text-h3"
-          }`}
-        >
+        <h3 className="mt-3 text-balance break-words text-h3 text-ink">
           {/* The ::after spans the card, so the whole tile is clickable while the
            * link's accessible name stays just the title. */}
           <Link

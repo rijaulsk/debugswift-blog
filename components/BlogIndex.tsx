@@ -116,7 +116,7 @@ export default function BlogIndex({
           </div>
         ) : (
           <>
-            <PostGrid posts={posts} showFeatured={isFirstPage} />
+            <PostGrid posts={posts} />
             <div className="mt-14">
               <Pagination page={page} total={totalPages} />
             </div>

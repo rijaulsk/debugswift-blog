@@ -23,15 +23,7 @@ import type { PostCard as PostCardType } from "@/lib/types";
  * somewhere in the title, excerpt or topic. No fuzzy matching and no ranking
  * model — on a small archive those add "why did THAT come up?" without adding
  * anything a reader would notice. */
-export default function PostGrid({
-  posts,
-  showFeatured = false,
-}: {
-  posts: PostCardType[];
-  /** Page one only. Elsewhere the lead card is an arbitrary post given twice
-   *  the weight of its neighbours for no reason a reader could work out. */
-  showFeatured?: boolean;
-}) {
+export default function PostGrid({ posts }: { posts: PostCardType[] }) {
   const [query, setQuery] = useState("");
   const trimmed = query.trim();
 
@@ -45,12 +37,7 @@ export default function PostGrid({
     });
   }, [posts, trimmed]);
 
-  /* The lead card is a browsing affordance. Once someone has typed a query they
-   * are looking for one specific thing, and promoting the first match to
-   * double size just makes the results harder to scan. */
   const searching = trimmed.length > 0;
-  const featured = !searching && showFeatured ? results[0] : undefined;
-  const rest = featured ? results.slice(1) : results;
 
   return (
     <>
@@ -102,23 +89,17 @@ export default function PostGrid({
           </p>
         </div>
       ) : (
-        <>
-          {/* The page's ONE intentional grid break: the lead post spans the
-           * full canvas while everything under it sits in a three-column
-           * rhythm. */}
-          {featured && (
-            <div className="mb-10">
-              <PostCard post={featured} featured />
-            </div>
-          )}
-          {rest.length > 0 && (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {rest.map((post) => (
-                <PostCard key={post.slug} post={post} />
-              ))}
-            </div>
-          )}
-        </>
+        /* One rhythm, every card the same. The first post used to be promoted to
+         * a full-width horizontal card as the page's intentional grid break —
+         * removed 23 Aug 2026 (owner's call). At 768px it rendered 672px wide
+         * against 320px neighbours, which is not a grid break so much as a
+         * different layout bolted onto the top of one, and it gave the newest
+         * post twice the weight for no reason a reader could work out. */
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {results.map((post) => (
+            <PostCard key={post.slug} post={post} />
+          ))}
+        </div>
       )}
     </>
   );

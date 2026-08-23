@@ -25,19 +25,35 @@ export default async function TopicNav() {
   const topics = await getTopics();
   if (topics.length === 0) return null;
 
+  /* whitespace-nowrap is load-bearing, not tidiness. Without it a chip is free
+   * to wrap INSIDE its own pill: "Websites that earn their keep" became four
+   * stacked lines with the rounded border broken around them, and the strip
+   * read as collapsed rather than scrollable. shrink-0 was already here but sat
+   * on the <a>, while the flex children are the <li>s — so the li shrank below
+   * its content and the anchor wrapped inside it. Both need it. */
   const itemClass =
-    "shrink-0 rounded-full border-[1.5px] px-4 py-1.5 text-small font-medium transition-colors duration-200 ease-out";
+    "block shrink-0 whitespace-nowrap rounded-full border-[1.5px] px-4 py-1.5 text-small font-medium transition-colors duration-200 ease-out";
 
   return (
     <nav
       aria-label="Blog topics"
       className="border-b border-mist bg-cream"
     >
-      {/* Scrolls sideways inside its own strip on a phone rather than wrapping
-       * to three rows or pushing the page wide. */}
-      <div className="mx-auto w-full max-w-canvas overflow-x-auto px-6 py-3 md:px-12">
-        <ul className="flex items-center gap-2">
-          <li>
+      {/* Scrolls sideways on a phone, wraps on a desktop.
+       *
+       * One row of chips is ~1,250px once the titles are not allowed to break
+       * mid-pill, so scrolling everywhere would hide two topics behind a
+       * horizontal scrollbar at 1024px — a sideways scroll is a normal gesture
+       * on a phone and a bad surprise with a mouse. Below lg it scrolls; from lg
+       * it wraps to a second row, which at 1440px it does not need anyway.
+       *
+       * The horizontal padding belongs to the UL, not to the scroll container.
+       * Padding on a scroller only holds on the leading edge: scroll to the end
+       * and the last chip butts against the viewport with nothing after it. On
+       * the list it travels with the content, so both ends keep their margin. */}
+      <div className="mx-auto w-full max-w-canvas overflow-x-auto py-3 lg:overflow-x-visible">
+        <ul className="flex w-max items-center gap-2 px-6 md:px-12 lg:w-auto lg:flex-wrap lg:gap-y-2">
+          <li className="shrink-0">
             <Link
               href={BLOG.home}
               className={`${itemClass} border-ink text-ink hover:bg-sand`}
@@ -46,7 +62,7 @@ export default async function TopicNav() {
             </Link>
           </li>
           {topics.map((topic) => (
-            <li key={topic.slug}>
+            <li key={topic.slug} className="shrink-0">
               <Link
                 href={BLOG.topic(topic.slug)}
                 className={`${itemClass} border-mist text-slate hover:border-ink hover:text-ink`}
@@ -66,10 +82,10 @@ export default async function TopicNav() {
               </Link>
             </li>
           ))}
-          <li>
+          <li className="shrink-0">
             <Link
               href={BLOG.topics}
-              className="shrink-0 px-2 text-small font-medium text-indigo-600 underline-offset-4 transition-colors duration-200 ease-out hover:text-indigo-700 hover:underline"
+              className="block shrink-0 whitespace-nowrap px-2 text-small font-medium text-indigo-600 underline-offset-4 transition-colors duration-200 ease-out hover:text-indigo-700 hover:underline"
             >
               All topics →
             </Link>
