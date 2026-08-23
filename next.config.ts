@@ -76,6 +76,37 @@ async function slugRedirects(): Promise<SlugRedirect[]> {
 const nextConfig: NextConfig = {
   basePath: "/blog",
 
+  /* Which commit is actually serving, and whether it found a Sanity project.
+   *
+   * Added 23 Aug 2026 after a day spent unable to tell two very different
+   * problems apart from outside: a deployment that is failing (so an older
+   * build keeps serving) and a deployment that succeeded without its
+   * environment variables. Both look identical over HTTP — the site is up, the
+   * pages render, and nothing says which build you are looking at.
+   *
+   * `curl -sI https://debugswift.com/blog | grep x-blog` now answers both in
+   * one line. Neither value is a secret: the commit is public on GitHub, and
+   * the second is a boolean, never the project id itself. */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "x-blog-commit",
+            value: (process.env.VERCEL_GIT_COMMIT_SHA ?? "local").slice(0, 12),
+          },
+          {
+            key: "x-blog-cms",
+            value: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim()
+              ? "sanity"
+              : "local-fixtures",
+          },
+        ],
+      },
+    ];
+  },
+
   images: {
     remotePatterns: [
       /* Post media. Cloudinary is the media library (chosen 28 Jul 2026);
