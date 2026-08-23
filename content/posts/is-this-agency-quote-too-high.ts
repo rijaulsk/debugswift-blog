@@ -61,7 +61,7 @@ export const isThisAgencyQuoteTooHigh: Post = {
     {
       question: "Should I just go with the cheapest?",
       answer:
-        "Only if the three quotes describe the same work, and they almost never do. The cheapest quote is usually the one that scoped the least, which means the difference reappears later as change requests — at a point where you have no leverage because switching would mean starting again.",
+        "Only if the three quotes describe the same work, and they almost never do. The cheapest quote is usually the one that scoped the least, which means the difference reappears later as change requests — at a point where you have no room to negotiate because switching would mean starting again.",
     },
     {
       question: "Is it rude to ask an agency to break down the price?",
