@@ -277,7 +277,7 @@ so `**[a link](url)**` is one bold link rather than literal brackets on the page
 - **It never invents a cover.** `cover:` must name a Cloudinary public_id that already
   exists; the CLI verifies it and takes Cloudinary's own dimensions. No cover is fine —
   omit the field and say what you would suggest in a `ds-note`. A wrong public_id is a
-  broken image on a live page.
+  broken image on a live page. To make one, see §9.
 - **It never creates a topic or an author.** Unknown slug, hard stop, with the valid ones
   listed.
 - **It never renames a slug, never sets `updatedAt`, and never publishes.**
@@ -318,3 +318,35 @@ Two things worth knowing:
 - **It will not run if the repository sits untouched for 60 days.** That is a GitHub
   rule, not ours. If you stop committing for two months, check the queue before trusting
   it.
+
+---
+
+## 9. Cover images
+
+```
+npm run cover <slug>                                  three variants to look at
+npm run cover <slug> -- --use 2 --alt "what it shows" attach the one you picked
+```
+
+Generated fresh per post with FLUX.1 Schnell on Cloudflare Workers AI — free daily
+allowance, no card. The prompt is the house Style Preamble (transcribed into
+`scripts/lib/artDirection.ts` from `IMAGE-PROMPTS.md`) plus the post's own title and
+topic.
+
+**Two commands, and the split is the point.** The first writes files and attaches
+nothing. The second requires `--alt`, which you cannot write without having looked at
+the picture — so the review is enforced by a field a screen-reader user needs anyway,
+rather than by a prompt nobody reads.
+
+**Reject and regenerate** if an image has any of: a cold white or grey background, a
+blue/teal tech palette, a dense circuit-board texture, gradient mesh or glassmorphism,
+**a person or a face**, readable fake text or a logo, clay as more than one small
+moment, or dead-centre symmetry with no negative space. The command prints that list at
+the point you need it.
+
+The no-people and no-text rules are honesty rules, not taste. A generated face is
+"never invent a person" broken in pixels; baked-in lettering is a claim nobody wrote.
+
+**The cover is for the page, not for sharing.** Social previews always use the generated
+title card at `/blog/og/<slug>`, even once a post has a photograph — a thumbnail two
+hundred pixels wide needs words on it, and a cropped still life says nothing there.

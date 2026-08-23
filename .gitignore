@@ -84,6 +84,12 @@ desktop.ini
 /dist/
 sanity.types.ts
 
+# Generated cover candidates. `npm run cover <slug>` writes three of these to
+# look at; one gets uploaded to Cloudinary and the rest are throwaway. The
+# uploaded one lives in the media library, which is where images belong — a copy
+# in the repo would be a second source of truth for the same asset.
+/covers/
+
 # Draft files are a WORKING DIRECTORY, not content.
 #
 # A draft file is a submission: `npm run push` reads it, validates it and writes

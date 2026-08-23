@@ -6,20 +6,21 @@ import type { Author, FaqItem, Post, PostCard, Topic } from "@/lib/types";
 /**
  * The share card for a post.
  *
- * Three tiers, best first:
+ * THE GENERATED CARD WINS, even when the post has a photograph, and that is
+ * deliberate rather than an oversight.
  *
- *  1. A Cloudinary cover, cropped to exactly 1200×630 with smart gravity. A
- *     photograph a person chose beats anything laid out by a computer.
- *  2. A generated card at /blog/og/<slug> carrying the post's own title. This is
- *     what most posts get, because most posts will not have a photograph for a
- *     while.
- *  3. The site card, only when there is no post at all to describe.
+ * A share card is read as a thumbnail — a couple of hundred pixels wide in a
+ * WhatsApp reply or a LinkedIn feed. At that size the post's own title is the
+ * only thing that tells anyone what they are about to open. An abstract still
+ * life, however good, says nothing there; cropped to 1.91:1 it usually says
+ * less. So /blog/og/<slug> carries the title, and the cover photograph does the
+ * job it is actually good at, which is being the image ON the page.
  *
- * Tier 2 used to be impossible and the reason is worth keeping: Satori cannot
- * read woff2, which was the only format public/fonts held, so the choice was an
- * off-brand typeface on every share or the author's own image. Two static
- * Satoshi weights (.otf) landed on 23 Aug 2026 purely for that route, and the
- * generated card became the better default.
+ * This inverted on 23 Aug 2026, when `npm run cover` made photographs likely.
+ * Before that, covers were rare and the order hardly mattered.
+ *
+ * The remaining fallbacks are for shapes that have no post to describe: a local
+ * /public cover from before the media library, then the site card.
  */
 export function ogImageFor(post: Pick<Post, "cover" | "slug">): {
   url: string;
@@ -27,6 +28,14 @@ export function ogImageFor(post: Pick<Post, "cover" | "slug">): {
   height: number;
   alt?: string;
 } {
+  if (post.slug) {
+    return {
+      url: blogUrl(`/og/${post.slug}`),
+      width: 1200,
+      height: 630,
+      alt: "DebugSwift — Debugging businesses swiftly.",
+    };
+  }
   if (post.cover?.publicId) {
     return {
       url: cloudinaryUrl(post.cover.publicId, { width: 1200, height: 630 }),
@@ -36,22 +45,11 @@ export function ogImageFor(post: Pick<Post, "cover" | "slug">): {
     };
   }
   if (post.cover) {
-    /* A local /public cover, pre-Cloudinary. Not 1.91:1, so platforms will crop
-     * it themselves — acceptable for the handful of posts that predate the
-     * media library. */
     return {
       url: `${SITE_URL}/blog${post.cover.src}`,
       width: post.cover.width,
       height: post.cover.height,
       alt: post.cover.alt,
-    };
-  }
-  if (post.slug) {
-    return {
-      url: blogUrl(`/og/${post.slug}`),
-      width: 1200,
-      height: 630,
-      alt: "DebugSwift — Debugging businesses swiftly.",
     };
   }
   return {

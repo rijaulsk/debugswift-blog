@@ -13,7 +13,8 @@
     "check-content": "tsx scripts/check-content.ts",
     "push": "tsx scripts/push.ts",
     "pull": "tsx scripts/pull.ts",
-    "publish-due": "tsx scripts/publish-due.ts"
+    "publish-due": "tsx scripts/publish-due.ts",
+    "cover": "tsx scripts/cover.ts"
   },
   "dependencies": {
     "@portabletext/react": "^7.0.1",
