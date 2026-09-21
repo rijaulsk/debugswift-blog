@@ -76,6 +76,17 @@ async function slugRedirects(): Promise<SlugRedirect[]> {
 const nextConfig: NextConfig = {
   basePath: "/blog",
 
+  /* Same reasoning as the main repo: one ~35KB stylesheet was blocking first
+   * paint, and inlining it removes the round trip. It matters more here than
+   * there — arriving at /blog is almost always a HARD navigation out of another
+   * deployment, so there is no warm client router to hide the wait behind.
+   * Measured on the main app: raw HTML roughly doubles, brotli grows by about a
+   * kilobyte, because the duplication is repeated text. Judge any future change
+   * on the BROTLI figure, never the raw one. */
+  experimental: {
+    inlineCss: true,
+  },
+
   /* Which commit is actually serving, and whether it found a Sanity project.
    *
    * Added 23 Aug 2026 after a day spent unable to tell two very different
@@ -135,6 +146,26 @@ const nextConfig: NextConfig = {
        * permanent: the origin root is not a canonical URL and a 308 would sit
        * in browser caches long after any change to this setup. */
       { source: "/", destination: "/blog", permanent: false, basePath: false as const },
+      /* Satoshi is loaded from the absolute path /fonts/Satoshi-Variable.woff2
+       * so that this app, the tools app and the main site share ONE cache entry
+       * instead of fetching the same 41.6KB file under three prefixes. See the
+       * note at the top of app/globals.css.
+       *
+       * In production that path is served by the MAIN deployment: only /blog
+       * and /tools are proxied, so /fonts/* never reaches this app and this
+       * rule is dead code there. It exists for standalone dev and the raw
+       * Vercel origin, where basePath puts this repo's own copy at
+       * /blog/fonts/… and a request to /fonts/… would 404.
+       *
+       * A redirect rather than a rewrite because Next refuses to REWRITE from
+       * outside the basePath to inside it ("rewrites urls outside of the
+       * basePath"). One 307 on one file, only ever in dev. */
+      {
+        source: "/fonts/:path*",
+        destination: "/blog/fonts/:path*",
+        permanent: false,
+        basePath: false as const,
+      },
       ...(await slugRedirects()),
     ];
   },
