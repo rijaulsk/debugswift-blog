@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import ReactDOM from "react-dom";
 import CrossAppPrefetch from "@/components/CrossAppPrefetch";
 import Footer from "@/components/Footer";
+import NavProgress from "@/components/NavProgress";
 import Header from "@/components/Header";
 import StickyMobileBar from "@/components/StickyMobileBar";
 import TopicNav from "@/components/TopicNav";
@@ -143,6 +144,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
         <CrossAppPrefetch />
+        <NavProgress />
         {/* Skip link.
           *
           * This deployment puts TWO navigation bars before the article — the
