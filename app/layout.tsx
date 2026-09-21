@@ -1,6 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import ReactDOM from "react-dom";
+import CrossAppPrefetch from "@/components/CrossAppPrefetch";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import StickyMobileBar from "@/components/StickyMobileBar";
@@ -141,6 +142,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
+        <CrossAppPrefetch />
         {/* Skip link.
           *
           * This deployment puts TWO navigation bars before the article — the
