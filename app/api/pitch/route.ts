@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     /* The angle is the entire basis for a yes or no. Two sentences is not a
      * pitch, and asking for more here costs a serious writer nothing. */
     return Response.json(
-      { ok: false, error: "Tell us a bit more about the angle — a paragraph at least." },
+      { ok: false, error: "Tell us a bit more about the angle: a paragraph at least." },
       { status: 400 },
     );
   }

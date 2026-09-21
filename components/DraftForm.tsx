@@ -107,7 +107,7 @@ export default function DraftForm({
         </label>
         <p className="mt-1 text-small text-slate">
           Plain text or markdown. <code>##</code> for headings, <code>-</code> for
-          bullets. Don&apos;t worry about formatting beyond that — we handle the
+          bullets. Don&apos;t worry about formatting beyond that; we handle the
           rest.
         </p>
         <textarea
@@ -121,8 +121,8 @@ export default function DraftForm({
         />
         <p className="mt-2 text-small text-slate">
           {words} words
-          {words > 0 && words < 800 && " — aiming for 800–1,500"}
-          {words > 1500 && " — over 1,500, consider cutting"}
+          {words > 0 && words < 800 && ", aiming for 800–1,500"}
+          {words > 1500 && ", over 1,500, consider cutting"}
         </p>
       </div>
 
@@ -170,7 +170,7 @@ export default function DraftForm({
             <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-4">
               {CONTACT_EMAIL}
             </a>{" "}
-            and send it that way — don&apos;t lose the draft.
+            and send it that way. Don&apos;t lose the draft.
           </p>
         )}
       </div>

@@ -121,7 +121,7 @@ export default function SubscribeBlock({ location }: { location: string }) {
 
           {state === "error" && (
             <p className="mt-3 text-small text-danger">
-              That didn&apos;t send — which we&apos;d rather tell you than pretend.
+              That didn&apos;t send, which we&apos;d rather tell you than pretend.
               Email{" "}
               <a
                 href={`mailto:${CONTACT_EMAIL}`}

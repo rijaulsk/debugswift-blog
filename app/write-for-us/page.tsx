@@ -23,7 +23,7 @@ const faqs = [
   {
     question: "Do you pay for guest posts?",
     answer:
-      "No, and we don't charge for them either. If either of those is what you're after, this isn't the right place — it's a place to write something you want read by people running small businesses.",
+      "No, and we don't charge for them either. If either of those is what you're after, this isn't the right place. It's a place to write something you want read by people running small businesses.",
   },
   {
     question: "Can I include a link to my site?",
@@ -33,7 +33,7 @@ const faqs = [
   {
     question: "How long should the post be?",
     answer:
-      "800 to 1,500 words, one idea, a concrete example inside the first three paragraphs. Longer isn't better — a post that says one thing properly beats one that says four things briefly.",
+      "800 to 1,500 words, one idea, a concrete example inside the first three paragraphs. Longer isn't better. A post that says one thing properly beats one that says four things briefly.",
   },
   {
     question: "Will you edit it?",
@@ -43,14 +43,14 @@ const faqs = [
   {
     question: "How long does it take to hear back?",
     answer:
-      "A pitch gets a yes or a no. We'd rather tell you it isn't a fit than leave you refreshing an inbox — that's the same standard we hold ourselves to on enquiries.",
+      "A pitch gets a yes or a no. We'd rather tell you it isn't a fit than leave you refreshing an inbox, and that's the same standard we hold ourselves to on enquiries.",
   },
 ];
 
 export const metadata: Metadata = {
   title: "Write for the DebugSwift blog",
   description:
-    "Pitch a post to the DebugSwift blog. One owner question, 800–1,500 words, edited before publishing. All outbound links are nofollow — no paid placements, ever.",
+    "Pitch a post to the DebugSwift blog. One owner question, 800–1,500 words, edited before publishing. All outbound links are nofollow. No paid placements, ever.",
   alternates: { canonical: canonicalPath("/write-for-us") },
   openGraph: {
     type: "website",
@@ -85,7 +85,7 @@ export default function WriteForUsPage() {
         </h1>
         <p className="mt-5 text-slate">
           We publish people who&apos;ve actually done the thing they&apos;re
-          writing about — an owner who fixed a process, a developer who watched a
+          writing about: an owner who fixed a process, a developer who watched a
           rebuild go wrong, an accountant who can explain what nobody explains.
           Pitch first; if it&apos;s a fit we&apos;ll send you a link to submit the
           full draft.
@@ -111,7 +111,7 @@ export default function WriteForUsPage() {
                 ],
                 [
                   "Nothing that reads like an advert",
-                  "Mention your company where it's relevant. Write a case study for it and we'll decline — politely, but we will.",
+                  "Mention your company where it's relevant. Write a case study for it and we'll decline, politely, but we will.",
                 ],
                 [
                   "Every outbound link is nofollow",

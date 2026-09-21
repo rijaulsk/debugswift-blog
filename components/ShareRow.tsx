@@ -73,7 +73,7 @@ export default function ShareRow({ url, title }: { url: string; title: string })
         {copied === "done"
           ? "Link copied"
           : copied === "failed"
-            ? "Couldn't copy — select the address bar"
+            ? "Couldn't copy: select the address bar"
             : "Copy link"}
       </button>
     </div>

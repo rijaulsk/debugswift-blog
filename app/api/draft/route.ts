@@ -80,7 +80,7 @@ export async function POST(request: Request) {
   }
   if (draftBody.length < 500) {
     return Response.json(
-      { ok: false, error: "That's shorter than we can work with — send the full draft." },
+      { ok: false, error: "That's shorter than we can work with. Send the full draft." },
       { status: 400 },
     );
   }

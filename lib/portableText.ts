@@ -268,7 +268,7 @@ export function toMarkdown(blocks: Block[] = []): string {
         break;
       }
       case "calloutBlock":
-        out.push(`> **${b.title ?? "Note"}** — ${b.text ?? ""}`);
+        out.push(`> **${b.title ?? "Note"}**: ${b.text ?? ""}`);
         break;
       case "faqBlock": {
         const items = (b.items as FaqItem[] | undefined) ?? [];
@@ -281,7 +281,7 @@ export function toMarkdown(blocks: Block[] = []): string {
         if (b.title) out.push(`\n### ${b.title}`);
         const steps = (b.steps as { title: string; text?: string }[] | undefined) ?? [];
         steps.forEach((s, i) => {
-          out.push(`${i + 1}. **${s.title}**${s.text ? ` — ${s.text}` : ""}`);
+          out.push(`${i + 1}. **${s.title}**${s.text ? `: ${s.text}` : ""}`);
         });
         break;
       }
@@ -301,12 +301,12 @@ export function toMarkdown(blocks: Block[] = []): string {
       case "serviceLink": {
         const slug = String(b.serviceSlug ?? "");
         const href = slug === "lead-engine" ? MAIN.leadEngine : MAIN.service(slug);
-        out.push(`> ${b.blurb ?? ""} — see [${slug}](${siteUrl(href)})`);
+        out.push(`> ${b.blurb ?? ""} See [${slug}](${siteUrl(href)})`);
         break;
       }
       case "sourcedStat":
         out.push(
-          `**${b.value ?? ""}** — ${b.label ?? ""} ([${b.sourceLabel ?? "source"}](${b.sourceUrl ?? ""}))`,
+          `**${b.value ?? ""}**: ${b.label ?? ""} ([${b.sourceLabel ?? "source"}](${b.sourceUrl ?? ""}))`,
         );
         break;
       case "codeBlock":

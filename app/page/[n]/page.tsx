@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const page = Number(n);
 
   return {
-    title: `${settings.title} — page ${page}`,
+    title: `${settings.title}, page ${page}`,
     description: settings.description,
     alternates: { canonical: canonicalPath(`/page/${page}`) },
   };

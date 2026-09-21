@@ -79,7 +79,7 @@ export default function PitchForm() {
         <p className="mt-3 text-h3 text-ink">We&apos;ll read it properly.</p>
         <p className="mt-3 text-slate">
           If it&apos;s a fit you&apos;ll get a reply with a link to send the full
-          draft. If it isn&apos;t, you&apos;ll get a reply saying so — we
+          draft. If it isn&apos;t, you&apos;ll get a reply saying so, and we
           don&apos;t leave people wondering.
         </p>
       </div>
@@ -128,7 +128,7 @@ export default function PitchForm() {
         </label>
         <p className="mt-1 text-small text-slate">
           Phrased the way an owner would ask it. &ldquo;Why does my spreadsheet
-          keep breaking?&rdquo; — not &ldquo;5 productivity hacks&rdquo;.
+          keep breaking?&rdquo;, not &ldquo;5 productivity hacks&rdquo;.
         </p>
         <input
           id="pitch-topic"
@@ -167,7 +167,7 @@ export default function PitchForm() {
       <fieldset>
         <legend className={labelClass}>Something you&apos;ve published</legend>
         <p className="mt-1 text-small text-slate">
-          Up to three links. Anything you wrote — it doesn&apos;t have to be
+          Up to three links. Anything you wrote; it doesn&apos;t have to be
           about this.
         </p>
         <div className="mt-2 space-y-3">

@@ -51,7 +51,7 @@ export default function PostGrid({ posts }: { posts: PostCardType[] }) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search — try “enquiries” or “spreadsheet”"
+            placeholder="Search: try “enquiries” or “spreadsheet”"
             autoComplete="off"
             className="w-full rounded-full border-[1.5px] border-ink bg-paper px-5 py-3 text-ink placeholder:text-stone focus:outline-none focus-visible:border-indigo-600"
           />
@@ -85,7 +85,7 @@ export default function PostGrid({ posts }: { posts: PostCardType[] }) {
             >
               topic
             </Link>{" "}
-            — they&apos;re grouped by problem, not by vocabulary.
+            , and they&apos;re grouped by problem, not by vocabulary.
           </p>
         </div>
       ) : (

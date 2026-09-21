@@ -90,10 +90,10 @@ export const metadata: Metadata = {
    * JSON-LD id would advertise the proxy origin and split the site in two. */
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Blog — DebugSwift",
+    default: "Blog | DebugSwift",
     /* Matches the main site's template so a tab from either deployment reads
      * the same way. */
-    template: "%s — DebugSwift",
+    template: "%s | DebugSwift",
   },
   description:
     "Plain-language write-ups on what technology is worth paying for, what isn't, and how to tell the difference. Written for owners of small and mid-sized businesses by the people who build the fixes.",
@@ -123,7 +123,7 @@ export const metadata: Metadata = {
         url: blogUrl("/og.png"),
         width: 1200,
         height: 630,
-        alt: "DebugSwift — Debugging businesses swiftly.",
+        alt: "DebugSwift: debugging businesses swiftly.",
       },
     ],
   },

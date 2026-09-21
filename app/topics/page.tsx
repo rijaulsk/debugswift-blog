@@ -15,7 +15,7 @@ import { BLOG, blogUrl, canonicalPath, siteUrl } from "@/lib/links";
 export const metadata: Metadata = {
   title: "Topics",
   description:
-    "Everything on the DebugSwift blog, grouped by the problem it solves — answering enquiries, automating busywork, websites that earn their keep, getting found, and buying technology well.",
+    "Everything on the DebugSwift blog, grouped by the problem it solves: answering enquiries, automating busywork, websites that earn their keep, getting found, and buying technology well.",
   alternates: { canonical: canonicalPath("/topics") },
 };
 

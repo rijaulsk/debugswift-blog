@@ -272,7 +272,7 @@ export default async function PostPage({ params }: Props) {
                   Twenty minutes, one honest answer, no invoice.
                 </p>
                 <p className="mt-3 max-w-xl text-slate">
-                  We&apos;ll tell you what we&apos;d fix first — and if the answer
+                  We&apos;ll tell you what we&apos;d fix first, and if the answer
                   is &ldquo;nothing yet&rdquo;, we&apos;ll say that too.
                 </p>
                 <div className="mt-6">
@@ -337,7 +337,7 @@ export default async function PostPage({ params }: Props) {
             <>
               <p className="mt-4 max-w-xl text-slate">
                 This is the first piece we&apos;ve published. Here&apos;s what
-                else is coming — pick the one that sounds like your week.
+                else is coming. Pick the one that sounds like your week.
               </p>
               <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {topics.map((topic) => (

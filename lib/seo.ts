@@ -33,7 +33,7 @@ export function ogImageFor(post: Pick<Post, "cover" | "slug">): {
       url: blogUrl(`/og/${post.slug}`),
       width: 1200,
       height: 630,
-      alt: "DebugSwift — Debugging businesses swiftly.",
+      alt: "DebugSwift: debugging businesses swiftly.",
     };
   }
   if (post.cover?.publicId) {
@@ -56,7 +56,7 @@ export function ogImageFor(post: Pick<Post, "cover" | "slug">): {
     url: blogUrl("/og.png"),
     width: 1200,
     height: 630,
-    alt: "DebugSwift — Debugging businesses swiftly.",
+    alt: "DebugSwift: debugging businesses swiftly.",
   };
 }
 
@@ -176,7 +176,7 @@ export function blogPostingJsonLd(post: Post): JsonLdNode {
             "@type": "AudioObject",
             contentUrl: post.audio.url,
             encodingFormat: "audio/mpeg",
-            name: `${post.title} — spoken version`,
+            name: `${post.title}: spoken version`,
             ...(post.audio.durationSeconds
               ? { duration: `PT${Math.round(post.audio.durationSeconds)}S` }
               : {}),
