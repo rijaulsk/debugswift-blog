@@ -81,6 +81,10 @@ export const MAIN = {
   terms: "/terms",
   sitemap: "/sitemap",
   service: (slug: string) => `/services/${slug}`,
+  /* An individual free tool. Served by a THIRD deployment, so like every other
+   * entry here it must be reached with MainSiteLink — next/link would turn it
+   * into /blog/tools/<slug>. */
+  tool: (slug: string) => `/tools/${slug}`,
 } as const;
 
 /* Client-side fetch targets.
